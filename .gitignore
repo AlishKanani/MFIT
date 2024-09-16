@@ -1,0 +1,9 @@
+*.pyc
+*log*
+*bk*
+*.o
+floorplan/
+heatmaps/
+output/
+Matlab_systemIdentification/Ganapati/
+case_study/

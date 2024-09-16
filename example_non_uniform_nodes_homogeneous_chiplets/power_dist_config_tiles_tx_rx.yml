@@ -1,0 +1,164 @@
+# distance in mm
+# power in W
+# distribution in csv file would be in % so here we mention max power
+# for homogeneous chiplets, only start_chiplet_x and start_chiplet_y is being used
+# for hetrogeneous distribution, length_chiplet_x and length_chiplet_y, nodes_x and nodes_y are also being used
+
+chiplet:
+  chiplet_1:
+    start_chiplet_x: 2.5
+    start_chiplet_y: 2.5
+    
+    layout_blocks: &id001
+      tile1_0:
+        start_point_x: 0
+        start_point_y: 0
+        length_x: 0.5556
+        length_y: 0.2375
+        max_power: 0.2104948316
+
+      tile1_1:
+        start_point_x: 0
+        start_point_y: 0.2375
+        length_x: 0.75
+        length_y: 0.3181
+        max_power: 0.3805752298
+
+      tile1_2:
+        start_point_x: 0.2375
+        start_point_y: 0.5556
+        length_x: 0.5125
+        length_y: 0.1944
+        max_power: 0.15892993874
+
+      tx1:
+        start_point_x: 0
+        start_point_y: 0.5556
+        length_x: 0.2375
+        length_y: 0.1944
+        max_power: 0.33
+
+      rx1:
+        start_point_x: 0.5556
+        start_point_y: 0
+        length_x: 0.1944
+        length_y: 0.2375
+        max_power: 0.0165
+      tile2_0:
+        start_point_x: 0.9444
+        start_point_y: 0
+        length_x: 0.5556
+        length_y: 0.2375
+        max_power: 0.2104948316
+
+      tile2_1:
+        start_point_x: 0.75
+        start_point_y: 0.2375
+        length_x: 0.75
+        length_y: 0.3181
+        max_power: 0.3805752298
+
+      tile2_2:
+        start_point_x: 0.75
+        start_point_y: 0.5556
+        length_x: 0.5125
+        length_y: 0.1944
+        max_power: 0.15892993874
+
+      tx2:
+        start_point_x: 0.75
+        start_point_y: 0
+        length_x: 0.1944
+        length_y: 0.2375
+        max_power: 0.33
+
+      rx2:
+        start_point_x: 1.2625
+        start_point_y: 0.5556
+        length_x: 0.2375
+        length_y: 0.1944
+        max_power: 0.0165
+      tile3_0:
+        start_point_x: 0.2375
+        start_point_y: 0.75
+        length_x: 0.5125
+        length_y: 0.1944
+        max_power: 0.15892993874
+
+      tile3_1:
+        start_point_x: 0
+        start_point_y: 0.9444
+        length_x: 0.75
+        length_y: 0.3181
+        max_power: 0.3805752298
+
+      tile3_2:
+        start_point_x: 0
+        start_point_y: 1.2625
+        length_x: 0.5556
+        length_y: 0.2375
+        max_power: 0.2104948316
+
+      tx3:
+        start_point_x: 0.5556
+        start_point_y: 1.2625
+        length_x: 0.1944
+        length_y: 0.2375
+        max_power: 0.33
+
+      rx3:
+        start_point_x: 0
+        start_point_y: 0.75
+        length_x: 0.2375
+        length_y: 0.1944
+        max_power: 0.0165
+      tile4_0:
+        start_point_x: 0.75
+        start_point_y: 0.75
+        length_x: 0.5125
+        length_y: 0.1944
+        max_power: 0.15892993874
+
+      tile4_1:
+        start_point_x: 0.75
+        start_point_y: 0.9444
+        length_x: 0.75
+        length_y: 0.3181
+        max_power: 0.3805752298
+
+      tile4_2:
+        start_point_x: 0.9444
+        start_point_y: 1.2625
+        length_x: 0.5556
+        length_y: 0.2375
+        max_power: 0.2104948316
+
+      tx4:
+        start_point_x: 1.2625
+        start_point_y: 0.75
+        length_x: 0.2375
+        length_y: 0.1944
+        max_power: 0.33
+
+      rx4:
+        start_point_x: 0.75
+        start_point_y: 1.2625
+        length_x: 0.1944
+        length_y: 0.2375
+        max_power: 0.0165
+
+  chiplet_2:
+    start_chiplet_x: 5.5
+    start_chiplet_y: 2.5
+    layout_blocks: *id001
+
+  chiplet_3:
+    start_chiplet_x: 2.5
+    start_chiplet_y: 5.5
+    layout_blocks: *id001
+    
+  chiplet_4:
+    start_chiplet_x: 5.5
+    start_chiplet_y: 5.5
+    layout_blocks: *id001
+    

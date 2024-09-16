@@ -1,0 +1,34 @@
+# distance in mm
+# power in W
+# distribution in csv file would be in % so here we mention max power
+# for homogeneous chiplets, only start_chiplet_x and start_chiplet_y is being used
+# for hetrogeneous distribution, length_chiplet_x and length_chiplet_y, nodes_x and nodes_y are also being used
+
+chiplet:
+
+  chiplet_1:
+    start_chiplet_x: 2.5
+    start_chiplet_y: 2.5
+    
+    layout_blocks: &id001
+      chiplet:
+        start_point_x: 0
+        start_point_y: 0
+        length_x: 1.5
+        length_y: 1.5
+        max_power: 3
+  
+  chiplet_2:
+    start_chiplet_x: 5.5
+    start_chiplet_y: 2.5
+    layout_blocks: *id001
+  
+  chiplet_3:
+    start_chiplet_x: 2.5
+    start_chiplet_y: 5.5
+    layout_blocks: *id001
+  
+  chiplet_4:
+    start_chiplet_x: 5.5
+    start_chiplet_y: 5.5
+    layout_blocks: *id001

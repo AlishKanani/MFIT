@@ -1,0 +1,63 @@
+link: 
+  density: 1250
+  specific_heat: 628.75
+  thermal_conductivity: 
+    kx: 212
+    ky: 150
+    kz: 150
+
+link_cu:
+  density: 8960
+  specific_heat: 385
+  thermal_conductivity: 398
+
+link_si:
+  density: 2330
+  specific_heat: 710
+  thermal_conductivity: 150
+
+ubump:
+  density: 2056
+  specific_heat: 52
+  thermal_conductivity: 30.94
+
+tim:
+  density: 2500
+  specific_heat: 1000
+  thermal_conductivity: 10
+
+substrate:
+  density: 1250
+  specific_heat: 1300
+  thermal_conductivity: 
+    kx: 20.68
+    ky: 20.68
+    kz: 0.3783
+
+lid: 
+  density: 8960
+  specific_heat: 385
+  thermal_conductivity: 398
+
+interposer:
+  density: 2330
+  specific_heat: 710
+  thermal_conductivity: 150
+
+chiplet:
+  density: 2330
+  specific_heat: 710
+  thermal_conductivity: 150
+
+c4:
+  density: 1250
+  specific_heat: 1300
+  thermal_conductivity: 
+    kx: 0.6431
+    ky: 0.6431
+    kz: 2.348
+
+adhesive:
+  density: 2500
+  specific_heat: 1000
+  thermal_conductivity: 1.9

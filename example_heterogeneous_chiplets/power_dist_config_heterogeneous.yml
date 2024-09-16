@@ -1,0 +1,85 @@
+# distance in mm
+# power in W
+# distribution in csv file would be in % so here we mention max power
+# for homogeneous chiplets, only start_chiplet_x and start_chiplet_y is being used from this file
+# for hetrogeneous distribution, length_chiplet_x and length_chiplet_y, nodes_x and nodes_y are also being used
+
+# for each block added extra field called material which can overwright layer material properties for the perticular block
+# if block is not power source, don't define layout_blocks -> after this update tool won't search for power sequence 
+
+chiplet:
+  chiplet_1:
+    start_chiplet_x: 2.5
+    start_chiplet_y: 2.5
+    length_chiplet_x: 1.5
+    length_chiplet_y: 4.5
+    nodes_x: 2
+    nodes_y: 6
+
+    layout_blocks:
+      chiplet:
+        start_point_x: 0
+        start_point_y: 0
+        length_x: 1.5
+        length_y: 4.5
+        max_power: 8
+  
+  chiplet_2:
+    start_chiplet_x: 5.5
+    start_chiplet_y: 2.5
+    length_chiplet_x: 1.5
+    length_chiplet_y: 1.5
+    nodes_x: 2
+    nodes_y: 2
+    
+    layout_blocks:
+      chiplet:
+        start_point_x: 0
+        start_point_y: 0
+        length_x: 1.5
+        length_y: 1.5
+        max_power: 3
+
+  chiplet_3:
+    start_chiplet_x: 5.5
+    start_chiplet_y: 5.5
+    length_chiplet_x: 1.5
+    length_chiplet_y: 1.5
+    nodes_x: 2
+    nodes_y: 2
+    material: 'interposer'
+
+    layout_blocks:
+      chiplet:
+        start_point_x: 0
+        start_point_y: 0
+        length_x: 1.5
+        length_y: 1.5
+        max_power: 3
+  
+ubump: &id001
+  chiplet_1:
+    start_chiplet_x: 2.5
+    start_chiplet_y: 2.5
+    length_chiplet_x: 1.5
+    length_chiplet_y: 4.5
+    nodes_x: 1
+    nodes_y: 3
+    
+  chiplet_2:
+    start_chiplet_x: 5.5
+    start_chiplet_y: 2.5
+    length_chiplet_x: 1.5
+    length_chiplet_y: 1.5
+    nodes_x: 1
+    nodes_y: 1
+    
+  chiplet_3:
+    start_chiplet_x: 5.5
+    start_chiplet_y: 5.5
+    length_chiplet_x: 1.5
+    length_chiplet_y: 1.5
+    nodes_x: 1
+    nodes_y: 1
+
+tim: *id001

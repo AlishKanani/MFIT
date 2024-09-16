@@ -1,0 +1,140 @@
+# in mm
+common:
+  x_length: 9.5
+  y_length: 9.5
+  z_length: 1.855
+  chiplet_x: 1.5
+  chiplet_y: 1.5
+  chiplet_spacing: 1.5
+  n_chiplet_x: 2
+  n_chiplet_y: 2
+  bc_top_htc : 1400
+  bc_bottom_htc : 25
+
+layers:
+  substrate_1:
+    thickness: 0.5
+    nodes: 
+      uniform: True
+      under_chiplet: False
+      x_nodes: 5
+      y_nodes: 5
+    start_point: 
+      x: 0.0
+      y: 0.0
+      z: 0.0
+    power_src: False
+    material: 'substrate'
+  
+  substrate_2:
+    thickness: 0.5
+    nodes: 
+      uniform: True
+      under_chiplet: False
+      x_nodes: 5
+      y_nodes: 5
+    start_point: 
+      x: 0.0
+      y: 0.0
+      z: 0.5
+    power_src: False
+    material: 'substrate'
+
+  # node cordinates are according to start point (x,y) of the layer
+  c4: 
+    thickness: 0.08
+    nodes: 
+      uniform: False
+      under_chiplet: False
+      x_nodes: [0.25, 0.875, 1.625, 2.75, 3.875, 4.625, 5.25]
+      y_nodes: [0.25, 0.875, 1.625, 2.75, 3.875, 4.625, 5.25]
+    start_point: 
+      x: 2.0
+      y: 2.0
+      z: 1.0
+    power_src: False
+    material: 'c4'
+  
+  interposer: 
+    thickness: 0.1
+    nodes: 
+      uniform: False
+      under_chiplet: False
+      x_nodes: [0.25, 0.875, 1.625, 2.75, 3.875, 4.625, 5.25]
+      y_nodes: [0.25, 0.875, 1.625, 2.75, 3.875, 4.625, 5.25]
+    start_point: 
+      x: 2.0
+      y: 2.0
+      z: 1.08
+    power_src: False
+    material: 'interposer'
+
+  ubump: 
+    thickness: 0.025
+    nodes:
+      uniform: False
+      under_chiplet: True
+      x_nodes: [0.375, 1.125]
+      y_nodes: [0.375, 1.125]
+    start_point: 
+      x: 2.5
+      y: 2.5
+      z: 1.18
+    power_src: False
+    material: 'ubump'
+
+  chiplet:
+    thickness: 0.1
+    nodes:
+      uniform: False
+      under_chiplet: True
+      x_nodes: [0.375, 1.125]
+      y_nodes: [0.375, 1.125]
+    start_point: 
+      x: 2.5
+      y: 2.5
+      z: 1.205
+    power_src: True
+    material: 'chiplet'
+
+  tim: 
+    thickness: 0.05
+    nodes: 
+      uniform: False
+      under_chiplet: True
+      x_nodes: [0.375, 1.125]
+      y_nodes: [0.375, 1.125]
+    start_point: 
+      x: 2.5
+      y: 2.5
+      z: 1.305
+    power_src: False
+    material: 'tim'
+
+  lid1:
+    thickness: 0.25
+    nodes: 
+      uniform: False
+      under_chiplet: False
+      x_nodes: [0.625, 1.875, 2.875, 3.625, 4.75, 5.875, 6.625, 7.625, 8.875]
+      y_nodes: [0.625, 1.875, 2.875, 3.625, 4.75, 5.875, 6.625, 7.625, 8.875]
+    start_point: 
+      x: 0.0
+      y: 0.0
+      z: 1.355
+    power_src: False
+    material: 'lid'
+
+  lid2:
+    thickness: 0.25
+    nodes: 
+      uniform: True
+      under_chiplet: False
+      x_nodes: 7
+      y_nodes: 7
+    start_point: 
+      x: 0.0
+      y: 0.0
+      z: 1.605
+    power_src: False
+    material: 'lid'
