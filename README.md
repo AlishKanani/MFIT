@@ -1,9 +1,9 @@
 # Thermal RC and DSS models for 2.5D and 3D chiplets
 
-This repository contains the code for the thermal RC and Discrete State Space (DSS) models for 2.5D and 3D chiplets. These models are part of our multifidielity thermal modeling for 2.5D and 3D multi-chiplet architectures.
+This repository contains the code for the thermal RC and Discrete State Space (DSS) models for 2.5D and 3D chiplets. These models are part of our multi-fidelity thermal modeling for 2.5D and 3D multi-chiplet architectures.
 
 ## Installation
-Thermal RC model is implemented using python wrapper which uses lsoda solver from [liblsoda](https://github.com/sdwfrost/liblsoda.git). However modified executable is already included in the repository. 
+The thermal RC model is implemented using a Python wrapper that uses the lsoda solver from [liblsoda](https://github.com/sdwfrost/liblsoda.git). However, the modified executable is already included in the repository. 
 
 To install other dependencies, run the following command:
 ```bash
@@ -11,11 +11,11 @@ pip install -r requirements.txt
 ```
 
 ## Major features
-- Thermal RC and DSS models are validated against FEM simulations for range of system sizes and power traces for 2.5D and 3D chiplets.
-- Each layer and blocks can have different granularity of nodes. This allows dense grid for active power sources and coarse grid for passive layers. Which makes the simulation faster.
-- The thermal RC model uses adaptive solver lsoda to solve the system of ODEs. Which is faster than the traditional explicit solvers.
-- In 2.5D and 3D chiplets system, the layers are expected have different material properties in x-y-z directions. The model supports anisotropic material properties.
-- Each layer can have different material blocks with different material properties. This allows to model any heterogeneous architectures.
+- Thermal RC and DSS models are validated against FEM simulations for a range of system sizes and power traces for 2.5D and 3D chiplets.
+- Each layer and block can have different granularity of nodes. This allows a dense grid for active power sources and a coarse grid for passive layers. Which makes the simulation faster.
+- The thermal RC model uses an adaptive solver, LSODA, to solve the system of ODEs, which is faster than traditional explicit solvers.
+- In 2.5D and 3D chiplets systems, the layers are expected to have different material properties in the x-y-z directions. The model supports anisotropic material properties.
+- Each layer can have different material blocks with different material properties, allowing for the modeling of heterogeneous architectures.
 
 ## Usage
 
@@ -102,18 +102,18 @@ We've provided examples for each of these configurations for 2x2 - 2.5D chiplets
   ```
   Other parameters are set to default values. 
 
-  Average temperature of each chiplet is not calculated in this case as the nodes are not uniformly distributed. But read nodes temperature from the `temperature_all_<time_step>.csv` file. Node numberings are provided in the floorplan images.
+  The average temperature of each chiplet is not calculated in this case as the nodes are not uniformly distributed. But read node temperature from the `temperature_all_<time_step>.csv` file. Node numberings are provided in the floorplan images.
 </details>
 
 <details>
   <summary>3. Heterogeneous chiplets</summary>
-  In this example we have 3 chiplets, one bigger and two smaller ones. 
+  In this example, we have 3 chiplets, one bigger and two smaller ones. 
   
-  When `is_homogeneous` is set to False, the model will ignore chiplet specific parameters from `geometry_file` instead use the parameters from `power_config_file` for each chiplet. 
+  When `is_homogeneous` is set to False, the model will ignore chiplet-specific parameters from `geometry_file` and instead use the parameters from `power_config_file` for each chiplet. 
   
-  For each layer marked with `under_chiplet: True` in the `geometry_file`, individual blocks needs to be defined in the `power_config_file`. In this case the power sequence should be defined only for blocks with `layout_blocks:` dictionary.
+  For each layer marked with `under_chiplet: True` in the `geometry_file`, individual blocks need to be defined in the `power_config_file`. In this case, the power sequence should be defined only for blocks with the `layout_blocks:` dictionary.
 
-  Also the material properties can be overriden for each block using `material:` key in the `power_config_file`.
+  Also, the material properties can be overridden for each block using the `material:` key in the `power_config_file`.
 
   Check the geometry file [here](example_heterogeneous_chiplets/chiplet_geometry_3_chiplets_uniform_nodes.yml) and power configuration file [here](example_heterogeneous_chiplets/power_dist_config_heterogeneous.yml) for more details.
 
@@ -131,7 +131,7 @@ We've provided examples for each of these configurations for 2x2 - 2.5D chiplets
 
 
 ### DSS Model
-If `--generate_DSS` is set to True, the code will generate the A and B matrices for the Discrete State Space (DSS) model, which can be used as following equation to predict the temperature of all the nodes:
+If `--generate_DSS` is set to True, the code will generate the A and B matrices for the Discrete State Space (DSS) model, which can be used as the following equation to predict the temperature of all the nodes:
 
 ```
 T(k+1) = A * T(k) + B * P(k)
@@ -140,7 +140,7 @@ T(k+1) = A * T(k) + B * P(k)
 where `T(k)` is the temperature of a node at step k, `P(k)` is the power input at step k, and `A` and `B` are the matrices generated by the code. More details about the DSS model can be found in our paper:
 
 ## Reference
-If you use the library in your research, please refer the following paper:
+If you use the library in your research, please refer to the following paper:
 ```bibtex
 @inproceedings{
 }
