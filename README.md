@@ -25,7 +25,6 @@ python thermal_RC.py --material_prop_file <path to material property yaml file> 
                      --power_config_file <path to power config yaml file> \
                      --power_seq_file <path to power sequence csv file> \
                      --output_dir <path to output directory> \
-                     --output_file <output file name> \
 
                      --simulation_type {transient,steady} \
                      --generate_DSS {True,False} \ # generates A and B for DSS model
