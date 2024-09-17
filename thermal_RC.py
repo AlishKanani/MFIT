@@ -7,11 +7,11 @@ import argparse
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--power_config_file', type=str, default='example_heterogeneous_chiplets/power_dist_config_heterogeneous.yml', help='Power distribution configuration file')
-    parser.add_argument('--power_seq_file', type=str, default='example_heterogeneous_chiplets/power_seq_random_3.csv', help='Power sequence file')
+    parser.add_argument('--power_config_file', type=str, default='example_3_heterogeneous_chiplets/power_dist_config_heterogeneous.yml', help='Power distribution configuration file')
+    parser.add_argument('--power_seq_file', type=str, default='example_3_heterogeneous_chiplets/power_seq_random_3.csv', help='Power sequence file')
     parser.add_argument('--material_prop_file', type=str, default='material_prop.yml', help='Material properties file')
-    parser.add_argument('--geometry_file', type=str, default='example_heterogeneous_chiplets/chiplet_geometry_3_chiplets_uniform_nodes.yml', help='Geometry properties file')
-    parser.add_argument('--output_dir', type=str, default='./example_heterogeneous_chiplets/', help='Output directory')
+    parser.add_argument('--geometry_file', type=str, default='example_3_heterogeneous_chiplets/chiplet_geometry_3_chiplets_uniform_nodes.yml', help='Geometry properties file')
+    parser.add_argument('--output_dir', type=str, default='./example_3_heterogeneous_chiplets/', help='Output directory')
 
     parser.add_argument('--simulation_type', type=str, default='transient', choices=['transient', 'steady'], help='transient or steady state simulation')
     parser.add_argument('--generate_DSS', type=lambda x: (str(x).lower() in ['true','1', 'yes']), default=True, help='Generate A and B for DSS')
