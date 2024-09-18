@@ -4,8 +4,18 @@ import numpy as np
 import os
 from scipy.signal import lti
 from ctypes import *
+import platform
 
 # load the shared C library, for the entire c-based solver
+# Here check the shared_library extension and load the library accordingly
+os_type = platform.system()
+if os_type == 'Windows':
+    shared_lib_ext = '.dll'
+elif os_type == 'Darwin':  # for macOS dylib works
+    shared_lib_ext = '.dylib'
+else:  # Assume Unix/Linux
+    shared_lib_ext = '.so'
+
 lib_solver = CDLL('c_files/chiplet_ode.so')  
 
 lib_solver.chiplet_ode.argtypes = [
