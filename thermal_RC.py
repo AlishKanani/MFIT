@@ -3,6 +3,7 @@ from power_class import Power_grid
 from package_class import Chiplet_package
 import time
 import argparse
+import platform
 
 
 def parse_args():
@@ -25,6 +26,18 @@ def parse_args():
 
     parser.add_argument('--generate_heatmap', type=lambda x: (str(x).lower() in ['true','1', 'yes']), default=True, help='Generate heatmap of final temperature')
     parser.add_argument('--time_heatmap', type=float, default=4, help='Time for heatmap generation in sec')
+
+    # Determine the appropriate file extension based on the operating system
+    os_type = platform.system()
+    if os_type == 'Windows':
+        shared_lib_ext = '.dll'
+    elif os_type == 'Darwin':  # for macOS dylib works
+        shared_lib_ext = '.dylib'
+    else:  # Assume Unix/Linux
+        shared_lib_ext = '.so'
+
+    # Example usage of the shared_lib_ext variable
+    parser.add_argument('--shared_lib', type=str, default=f'library{shared_lib_ext}', help='Shared library file')
 
     args = parser.parse_args()
     return args
