@@ -13,10 +13,11 @@ if os_type == 'Windows':
     shared_lib_ext = '.dll'
 elif os_type == 'Darwin':  # for macOS dylib works
     shared_lib_ext = '.dylib'
+    print(f'OS: {os_type} as of now not supported')
 else:  # Assume Unix/Linux
     shared_lib_ext = '.so'
 
-lib_solver = CDLL('c_files/chiplet_ode.so')  
+lib_solver = CDLL(f'c_files/chiplet_ode{shared_lib_ext}')  
 
 lib_solver.chiplet_ode.argtypes = [
     POINTER(POINTER(c_double)),  # output temperature
