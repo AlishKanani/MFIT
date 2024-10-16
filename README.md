@@ -143,6 +143,11 @@ where `T(k)` is the temperature of a node at step k, `P(k)` is the power input a
 ## Reference
 If you use the library in your research, please refer to the following paper:
 ```bibtex
-@inproceedings{
+@article{MFIT_2024,
+      title={MFIT: Multi-Fidelity Thermal Modeling for 2.5D and 3D Multi-Chiplet Architectures}, 
+      author={Pfromm, Lukas and Kanani, Alish and Sharma, Harsh and Solanki, Parth and Tervo, Eric and Park, Jaehyun and Doppa, Janardhan Rao and Pande, Partha Pratim and Ogras, Umit Y},
+      journal={arXiv preprint arXiv:2410.09188},
+      year={2024},
+      url={https://arxiv.org/abs/2410.09188}, 
 }
 ```
