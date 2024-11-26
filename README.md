@@ -11,7 +11,7 @@ pip install -r requirements.txt
 ```
 
 ## Major features
-- Thermal RC and DSS models are validated against FEM simulations for a range of system sizes and power traces for 2.5D and 3D chiplets.
+- Thermal RC and DSS models are validated against FEM simulations (using [ANSYS Fluent](https://www.ansys.com/products/fluids/ansys-fluent)) for a range of system sizes and power traces for 2.5D and 3D chiplets.
 - Each layer and block can have different granularity of nodes. This allows a dense grid for active power sources and a coarse grid for passive layers. Which makes the simulation faster.
 - The thermal RC model uses an adaptive solver, LSODA, to solve the system of ODEs, which is faster than traditional explicit solvers.
 - In 2.5D and 3D chiplets systems, the layers are expected to have different material properties in the x-y-z directions. The model supports anisotropic material properties.
