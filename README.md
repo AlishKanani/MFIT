@@ -110,6 +110,7 @@ python thermal_RC.py --material_prop_file <path to material property yaml file> 
                      --time_heatmap <Time for heatmap generation in sec> 
 
 ```
+Note: For timing analysis, turn off the `generate_heatmap` and `generate_DSS` flags.
 
 ### Inputs
 There are four main input configuration files which are used to run the thermal RC model:
