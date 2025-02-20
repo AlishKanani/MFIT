@@ -30,6 +30,7 @@ def parse_args():
 
 if __name__ == '__main__':
     # load material properties from yaml file
+    start = time.time()
 
     args = parse_args()
 
@@ -55,7 +56,5 @@ if __name__ == '__main__':
 
     package.generate_floorplan()
 
-    start = time.time()
-
-    package.run_simulation_c_lsoda()
+    package.run_simulation_c_superlu()
     print('Time taken for simulation: ', time.time()-start)

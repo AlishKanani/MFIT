@@ -15,7 +15,7 @@ This file contains the material properties of the materials used in the 2.5D/3D 
 ```yaml
 <material_name>:
   density: <density in kg/m^3>
-  specific_heat: <specific heat in J/m^3>
+  specific_heat: <specific heat in J/Kg-K>
   thermal_conductivity: <thermal conductivity in W/m-K> or
   thermal_conductivity: 
     kx: <thermal conductivity in W/m-K along x direction>

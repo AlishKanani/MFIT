@@ -134,7 +134,8 @@ class Power_grid:
     
     def create_power_seq_grid(self, utils):
         for layer in self.power_layers:
-            layer.plot_layer(utils)
+            if self.args.generate_heatmap:
+                layer.plot_layer(utils)
             layer.create_power_seq_layer(self.power_seq)
 
 if __name__ == '__main__':

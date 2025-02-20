@@ -10,22 +10,22 @@ import platform
 # Here check the shared_library extension and load the library accordingly
 os_type = platform.system()
 if os_type == 'Windows':
-    shared_lib_ext = '.dll'
+    print('Windows OS is not supported')
+    exit()
 elif os_type == 'Darwin':  # for macOS dylib works
-    shared_lib_ext = '.dylib'
+    print('macOS is not supported')
+    exit()
 else:  # Assume Unix/Linux
     shared_lib_ext = '.so'
 
-lib_solver = CDLL(f'c_files/chiplet_ode{shared_lib_ext}')  
+lib_solver = CDLL(f'c_files/solve_chiplet_ode_slu{shared_lib_ext}')  
 
 lib_solver.chiplet_ode.argtypes = [
     POINTER(POINTER(c_double)),  # output temperature
     POINTER(POINTER(c_double)),  # power input
-    POINTER(POINTER(c_double)),  # G_all
-    POINTER(POINTER(c_int)),   # non_zero_indexes
-    np.ctypeslib.ndpointer(dtype=np.double, ndim=1, flags='C_CONTIGUOUS'),   # C
+    POINTER(POINTER(c_double)),  # A_all
+    np.ctypeslib.ndpointer(dtype=np.double, ndim=1, flags='C_CONTIGUOUS'),   # B_all
     c_int,  # total_nodes
-    c_int,  # non_zero_columns
     c_double, # total_duration
     c_double, # time_step
     c_double, # power_interval
@@ -33,9 +33,8 @@ lib_solver.chiplet_ode.argtypes = [
 
 lib_solver.chiplet_ode.restype = None
 
-def chiplet_ode_c(output_temperature, power_input, G_all, non_zero_indexes, C, total_nodes, non_zero_columns, total_duration, time_step, power_interval):
-
-    lib_solver.chiplet_ode(output_temperature, power_input, G_all, non_zero_indexes, C, total_nodes, non_zero_columns, total_duration, time_step, power_interval)
+def chiplet_ode_c(output_temperature, power_input, A_all, B_all, total_nodes, total_duration, time_step, power_interval):
+    lib_solver.chiplet_ode(output_temperature, power_input, A_all, B_all, total_nodes, total_duration, time_step, power_interval)
 
 class Chiplet_package:
     def __init__(self, material_properties, geometry_dict, power_grid_class, args, utils=common.Utils):
@@ -156,18 +155,16 @@ class Chiplet_package:
         else:
             pass
 
+
         if self.args.generate_DSS:
             self.generate_DSS()
+        self.cont_A = (np.eye(self.package_total_nodes()) + self.args.time_step*self.conductance_all*self.capacitance_all).T
+        self.cont_B = self.args.time_step*self.capacitance_all
 
-        non_zero_conductance = [row[row != 0] for row in self.conductance_all]
-        non_zero_index = [list(np.nonzero(row)[0]) for row in self.conductance_all]
-        max_len = max(len(row) for row in non_zero_conductance)
+        # A and B are for below equation
+        # A : I - time_step*CG 
+        # B : time_step*C dT 
 
-        self.non_zero_index = np.array([row + [row[-1]] * (max_len - len(row)) for row in non_zero_index])
-        self.conductance_all = np.zeros((self.conductance_all.shape[0], max_len))
-
-        for i, row in enumerate(non_zero_conductance):
-            self.conductance_all[i, :len(row)] = row
 
     def connect_layers(self, top_layer, bottom_layer):
         shared_conductance = np.zeros((bottom_layer.layer_total_nodes(), top_layer.layer_total_nodes()))
@@ -334,10 +331,12 @@ class Chiplet_package:
             self.power[global_iter:global_iter+layer.layer_total_nodes()] = layer.get_power(power_steps)
             global_iter += layer.layer_total_nodes()
 
-        # export power to csv file
-        np.savetxt(self.args.output_dir + '/output/power_all.csv', self.power.T, delimiter=',')
+        # if dss
+        if self.args.generate_DSS:
+            # export power to csv file
+            np.savetxt(self.args.output_dir + '/output/power_all.csv', self.power.T, delimiter=',')
 
-    def run_simulation_c_lsoda(self):
+    def run_simulation_c_superlu(self):
 
         total_duration = self.args.total_duration
         self.set_initial_conditions()
@@ -368,23 +367,17 @@ class Chiplet_package:
             for i in range(power.shape[0]):
                 c_power[i] = (c_double * power.shape[1])(*power[i])
 
-        G_all = self.conductance_all
-        non_zero_index = self.non_zero_index
+        A_all = self.cont_A
 
-        c_G_all = (POINTER(c_double) * G_all.shape[0])()
-        for i in range(G_all.shape[0]):
-            c_G_all[i] = (c_double * G_all.shape[1])(*G_all[i])
+        c_A_all = (POINTER(c_double) * A_all.shape[0])()
+        for i in range(A_all.shape[0]):
+            c_A_all[i] = (c_double * A_all.shape[1])(*A_all[i])
 
-        c_non_zero_index = (POINTER(c_int) * non_zero_index.shape[0])()
-        for i in range(non_zero_index.shape[0]):
-            c_non_zero_index[i] = (c_int * non_zero_index.shape[1])(*non_zero_index[i])
 
         chiplet_ode_c(c_temperature_all, c_power, 
-                      c_G_all, 
-                      c_non_zero_index, 
-                      self.capacitance_all, 
+                      c_A_all, 
+                      self.cont_B, 
                       self.package_total_nodes(), 
-                      self.non_zero_index.shape[1], 
                       total_duration, dt, power_interval)
         
 
