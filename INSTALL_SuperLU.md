@@ -12,6 +12,7 @@ unzip v7.0.0.zip
 cd superlu-7.0.0
 ```
 Make sure you have `cmake` installed on your system. 
+
 2. Create a build directory and run cmake.
 
 ```bash
