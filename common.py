@@ -50,3 +50,5 @@ class Utils:
 
         self.top_htc = common_dict['bc_top_htc']
         self.bottom_htc = common_dict['bc_bottom_htc']
+
+        self.ambient_temp = common_dict.get('ambient_temp', 300.0)  # Default to 300.0 K if not specified

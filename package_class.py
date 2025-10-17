@@ -281,7 +281,7 @@ class Chiplet_package:
         np.savetxt(self.args.output_dir + '/output/disc_B_matrix.csv', discrete_B, delimiter=',')
 
     def write_temperature_to_file(self, ts):
-        self.temperature_all_save = np.array(self.temperature_all_save) + 300.0
+        self.temperature_all_save = np.array(self.temperature_all_save) + self.common_utils.ambient_temp
 
         # save the temperature to a file
         file_name = f'{self.args.output_dir}/output/temperature_all_{ts}.csv'
@@ -292,7 +292,7 @@ class Chiplet_package:
 
         if self.args.generate_heatmap:
             index_heatmap = int(self.args.time_heatmap/self.args.time_step)
-            plot_temperature = temperature_all_map[:, index_heatmap] - 300.0
+            plot_temperature = temperature_all_map[:, index_heatmap] - 273.15  # convert to Celsius
             num_nodes = 0
             for layer in self.layers:
                 layer_start = num_nodes

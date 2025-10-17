@@ -10,6 +10,7 @@ common:
   n_chiplet_y: 2
   bc_top_htc : 1400
   bc_bottom_htc : 25
+  ambient_temp : 300 # in Kelvin
 
 layers:
   substrate_1:

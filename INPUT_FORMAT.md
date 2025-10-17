@@ -42,6 +42,7 @@ common:
   n_chiplet_y: <number of chiplets in y direction> # used only for homogeneous chiplets
   bc_top_htc : <heat transfer coefficient at top boundary in W/m^2-K>
   bc_bottom_htc : <heat transfer coefficient at bottom boundary in W/m^2-K>
+  ambient_temp : <ambient temperature in Kelvin> # optional, default is 300.0 K
 ```
 
 #### Layer Properties
