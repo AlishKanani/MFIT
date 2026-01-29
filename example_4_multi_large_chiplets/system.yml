@@ -1,0 +1,245 @@
+version: 1
+
+# Package-level settings
+package:
+  x_length: 40.0
+  y_length: 60.0
+  bc_top_htc: 1200
+  bc_bottom_htc: 20
+  ambient_temp: 300
+
+# Layer stack definition (bottom to top)
+stack:
+  substrate:
+    layers:
+      # Coarse bulk substrate layer
+      - name: substrate-bulk
+        thickness: 0.3
+        material: substrate
+        nodes: {x_nodes: 30, y_nodes: 45}
+      
+      # Fine substrate layer with embedded silicon links
+      - name: substrate-link-slice
+        thickness: 0.1
+        material: substrate
+        nodes: {x_nodes: 60, y_nodes: 90}
+        # Define silicon link regions (higher thermal conductivity pathways)
+        regions:
+          # Horizontal silicon link between chiplets 1-2
+          - name: silicon_link_h1
+            material: silicon
+            start_x: 13.0
+            start_y: 12.5
+            length_x: 14.0
+            length_y: 5.0
+          
+          # Horizontal silicon link between chiplets 3-4
+          - name: silicon_link_h2
+            material: silicon
+            start_x: 13.0
+            start_y: 42.5
+            length_x: 14.0
+            length_y: 5.0
+          
+          # Vertical silicon link between chiplets 1-3
+          - name: silicon_link_v1
+            material: silicon
+            start_x: 7.5
+            start_y: 23.0
+            length_x: 5.0
+            length_y: 14.0
+          
+          # Vertical silicon link between chiplets 2-4
+          - name: silicon_link_v2
+            material: silicon
+            start_x: 27.5
+            start_y: 23.0
+            length_x: 5.0
+            length_y: 14.0
+
+  ubump:
+    layers:
+      - name: ubump
+        thickness: 0.025
+        material: ubump
+        nodes: {x_nodes: 8, y_nodes: 16}
+
+  chip:
+    layers:
+      count: 1
+      layer_name_prefix: chiplet-layer_
+      thickness_each: 0.1
+      material: chiplet
+      nodes: {x_nodes: 8, y_nodes: 16}
+      power_src_layers: [1]  # Layer 1 has power sources
+
+  tim:
+    layers:
+      - name: tim-base
+        thickness: 0.025
+        material: tim
+        nodes: {x_nodes: 8, y_nodes: 16}
+
+  lid:
+    layers:
+      - name: lid-lower
+        thickness: 1.0
+        material: lid
+        nodes: {x_nodes: 20, y_nodes: 30}
+      - name: lid-upper
+        thickness: 1.0
+        material: lid
+        nodes: {x_nodes: 20, y_nodes: 30}
+
+# Chiplet placement (2x2 array)
+chips:
+  - name: chiplet_1
+    origin: {x: 5.0, y: 5.0}
+    size: {x: 10.0, y: 20.0}
+  - name: chiplet_2
+    origin: {x: 25.0, y: 5.0}
+    size: {x: 10.0, y: 20.0}
+  - name: chiplet_3
+    origin: {x: 5.0, y: 35.0}
+    size: {x: 10.0, y: 20.0}
+  - name: chiplet_4
+    origin: {x: 25.0, y: 35.0}
+    size: {x: 10.0, y: 20.0}
+
+# Power traces (percentage of max_power over time)
+power_traces:
+  steady_100:
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+    - 100
+
+# Power blocks (defined in chip-local coordinates)
+power_blocks:
+  # Chiplet 1 - full chip background power
+  - chip: chiplet_1
+    layer: chiplet-layer_1
+    name: background
+    rect: {x: 0.0, y: 0.0, lx: 10.0, ly: 20.0}
+    max_power_w: 70.0
+    trace: steady_100
+  
+  # Chiplet 2
+  - chip: chiplet_2
+    layer: chiplet-layer_1
+    name: background
+    rect: {x: 0.0, y: 0.0, lx: 10.0, ly: 20.0}
+    max_power_w: 70.0
+    trace: steady_100
+  
+  # Chiplet 3
+  - chip: chiplet_3
+    layer: chiplet-layer_1
+    name: background
+    rect: {x: 0.0, y: 0.0, lx: 10.0, ly: 20.0}
+    max_power_w: 70.0
+    trace: steady_100
+  
+  # Chiplet 4
+  - chip: chiplet_4
+    layer: chiplet-layer_1
+    name: background
+    rect: {x: 0.0, y: 0.0, lx: 10.0, ly: 20.0}
+    max_power_w: 70.0
+    trace: steady_100

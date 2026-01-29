@@ -4,6 +4,30 @@ from matplotlib import pyplot as plt
 from matplotlib.patches import Rectangle
 import numpy as np
 import os, sys
+from collections import defaultdict
+
+
+class MaterialRegion:
+    """
+    Rectangular region within a layer that can override the layer's default material.
+    Supports defining heterogeneous materials within a single unified node grid.
+    """
+    def __init__(self, cfg, default_name):
+        self.name = cfg.get('name', default_name)
+        self.material = cfg.get('material')
+        self.start_x = cfg.get('start_x', cfg.get('x', 0.0))
+        self.start_y = cfg.get('start_y', cfg.get('y', 0.0))
+        self.length_x = cfg.get('length_x', cfg.get('lx', None))
+        self.length_y = cfg.get('length_y', cfg.get('ly', None))
+
+        if self.length_x is None or self.length_y is None:
+            raise ValueError(f"Region '{self.name}' must define length_x/length_y (or lx/ly).")
+    
+    def contains_point(self, x, y):
+        """Check if point (x, y) is within this region."""
+        return (self.start_x <= x < (self.start_x + self.length_x) and 
+                self.start_y <= y < (self.start_y + self.length_y))
+
 
 # layer class for the chiplet thermal model, it takes a dictionary of material properties and geometry properties
 class Layer_chiplet:
@@ -27,6 +51,17 @@ class Layer_chiplet:
         # For non-homogeneous chiplets, nodes are stored as a 1D list and grouped by chiplet.
         # Each entry is (start_idx, nodes_x, nodes_y) in the linear node array.
         self._chiplet_ranges = []
+        
+        # Initialize material regions from layer dict
+        self.material_regions = self._initialize_material_regions(layer_dict)
+    
+    def _initialize_material_regions(self, layer_dict):
+        """Initialize material regions from layer definition."""
+        regions = []
+        for idx, region_cfg in enumerate(layer_dict.get('regions', [])):
+            default_name = region_cfg.get('name', f"{self.layer_name}_region_{idx}")
+            regions.append(MaterialRegion(region_cfg, default_name))
+        return regions
 
     def is_power_src(self):
         return self.power_src
@@ -283,19 +318,79 @@ class Layer_chiplet:
                         
                 prev_nodes = prev_nodes + x_nodes_c*y_nodes_c
 
+        # Apply material regions if defined (before setting thermal properties)
+        if self.material_regions:
+            self._apply_material_regions(material_properties)
+        
         # set thermal capacitance and resistance for each node
         if self.is_layer_under_chiplet() and not self.args.is_homogeneous:
             for i in range(self.total_nodes):
-                self.nodes[i].set_thermal_properties(self.nodes[i].material_properties)
+                # Use node's material_properties if set by region, else use layer default
+                mp = getattr(self.nodes[i], 'material_properties', None)
+                if mp is None:
+                    mp = self.layer_material_properties
+                    self.nodes[i].material_properties = mp
+                self.nodes[i].set_thermal_properties(mp)
                 self.nodes[i].set_boundary_condition(boundary=bc, 
                                                     utils=utils)
         else:
             for i in range(self.total_x_nodes):
                 for j in range(self.total_y_nodes):
-                    self.nodes[i][j].set_thermal_properties(self.layer_material_properties)
+                    # Use node's material_properties if set by region, else use layer default
+                    mp = getattr(self.nodes[i][j], 'material_properties', None)
+                    if mp is None:
+                        mp = self.layer_material_properties
+                        self.nodes[i][j].material_properties = mp
+                    self.nodes[i][j].set_thermal_properties(mp)
                     self.nodes[i][j].set_boundary_condition(boundary=bc, 
                                                             utils=utils)
 
+    def _apply_material_regions(self, material_properties):
+        """Apply material overrides from regions to nodes based on spatial containment."""
+        if not self.material_regions:
+            return
+        
+        # Process nodes based on layer structure
+        if self.is_layer_under_chiplet() and not self.args.is_homogeneous:
+            # 1D node array (non-homogeneous chiplets)
+            for i in range(self.total_nodes):
+                node = self.nodes[i]
+                # Node center point
+                cx = node.x + 0.5 * node.x_length
+                cy = node.y + 0.5 * node.y_length
+                
+                matched_region = None
+                for region in self.material_regions:
+                    if region.contains_point(cx, cy):
+                        if matched_region is not None:
+                            raise ValueError(
+                                f"Overlapping regions '{matched_region.name}' and '{region.name}' "
+                                f"in layer '{self.layer_name}' are not allowed."
+                            )
+                        matched_region = region
+                if matched_region and matched_region.material in material_properties:
+                    node.material_properties = material_properties[matched_region.material]
+        else:
+            # 2D node array (homogeneous or non-chiplet layers)
+            for i in range(self.total_x_nodes):
+                for j in range(self.total_y_nodes):
+                    node = self.nodes[i][j]
+                    # Node center point
+                    cx = node.x + 0.5 * node.x_length
+                    cy = node.y + 0.5 * node.y_length
+                    
+                    matched_region = None
+                    for region in self.material_regions:
+                        if region.contains_point(cx, cy):
+                            if matched_region is not None:
+                                raise ValueError(
+                                    f"Overlapping regions '{matched_region.name}' and '{region.name}' "
+                                    f"in layer '{self.layer_name}' are not allowed."
+                                )
+                            matched_region = region
+                    if matched_region and matched_region.material in material_properties:
+                        node.material_properties = material_properties[matched_region.material]
+    
     def connect_nodes(self):
         # 1. each layer would create 1D and 2D array for capacitance and resistance. 
             # layer would return 1D array of capacitanace, 2D array of resistance, 

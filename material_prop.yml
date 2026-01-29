@@ -61,3 +61,11 @@ adhesive:
   density: 2500
   specific_heat: 1000
   thermal_conductivity: 1.9
+
+silicon:
+  density: 2330
+  specific_heat: 712
+  thermal_conductivity:
+    kx: 148.0
+    ky: 148.0
+    kz: 148.0
