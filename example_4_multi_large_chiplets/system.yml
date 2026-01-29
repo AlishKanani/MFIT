@@ -16,13 +16,13 @@ stack:
       - name: substrate-bulk
         thickness: 0.3
         material: substrate
-        nodes: {x_nodes: 30, y_nodes: 45}
+        nodes: {x_nodes: 98, y_nodes: 146}
       
       # Fine substrate layer with embedded silicon links
       - name: substrate-link-slice
         thickness: 0.1
         material: substrate
-        nodes: {x_nodes: 60, y_nodes: 90}
+        nodes: {x_nodes: 195, y_nodes: 292}
         # Define silicon link regions (higher thermal conductivity pathways)
         regions:
           # Horizontal silicon link between chiplets 1-2
@@ -62,7 +62,7 @@ stack:
       - name: ubump
         thickness: 0.025
         material: ubump
-        nodes: {x_nodes: 8, y_nodes: 16}
+        nodes: {x_nodes: 26, y_nodes: 52}
 
   chip:
     layers:
@@ -70,7 +70,7 @@ stack:
       layer_name_prefix: chiplet-layer_
       thickness_each: 0.1
       material: chiplet
-      nodes: {x_nodes: 8, y_nodes: 16}
+      nodes: {x_nodes: 26, y_nodes: 52}
       power_src_layers: [1]  # Layer 1 has power sources
 
   tim:
@@ -78,18 +78,18 @@ stack:
       - name: tim-base
         thickness: 0.025
         material: tim
-        nodes: {x_nodes: 8, y_nodes: 16}
+        nodes: {x_nodes: 26, y_nodes: 52}
 
   lid:
     layers:
       - name: lid-lower
         thickness: 1.0
         material: lid
-        nodes: {x_nodes: 20, y_nodes: 30}
+        nodes: {x_nodes: 65, y_nodes: 98}
       - name: lid-upper
         thickness: 1.0
         material: lid
-        nodes: {x_nodes: 20, y_nodes: 30}
+        nodes: {x_nodes: 65, y_nodes: 98}
 
 # Chiplet placement (2x2 array)
 chips:

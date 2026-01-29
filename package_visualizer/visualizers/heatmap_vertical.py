@@ -521,13 +521,13 @@ class VerticalHeatmapVisualizer(BaseVisualizer):
         )
         
         # Save to HTML with scroll zoom enabled
-        subdir = f'heatmaps/{plane_type}_combined'
+        subdir = f'heatmaps/{plane_type}_interactive'
         filename = f'{plane_type.lower()}_cut_at_'
         filename += f'x{cut_value:.2f}mm.html' if plane_type == 'YZ' else f'y{cut_value:.2f}mm.html'
         
         config = {'scrollZoom': True}
         self._save_plotly_figure(fig, subdir, filename, config=config)
-        print(f"Generated combined {plane_type} visualization at {cut_value:.2f} mm")
+        print(f"Generated interactive {plane_type} visualization at {cut_value:.2f} mm")
     
     def generate_vertical_heatmaps(self, temperature_all_map, index_heatmap):
         """

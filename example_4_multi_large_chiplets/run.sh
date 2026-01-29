@@ -10,10 +10,10 @@ mfroot="$(cd "$here/.." && pwd)"
 outdir="$here/generated"
 mkdir -p "$outdir"
 
-# Generate configuration files from system.yml
-python3 "$mfroot/tools/build_system.py" \
-  --system "$here/system.yml" \
-  --outdir "$outdir"
+# # Generate configuration files from system.yml
+# python3 "$mfroot/tools/build_system.py" \
+#   --system "$here/system.yml" \
+#   --outdir "$outdir"
 
 # Run simulation
 python3 "$mfroot/thermal_RC.py" \
@@ -27,7 +27,10 @@ python3 "$mfroot/thermal_RC.py" \
   --power_interval 1 \
   --time_step 1 \
   --time_heatmap 100 \
-  --generate_2d_floorplan true \
-  --generate_3d_floorplan true \
+  --generate_2d_floorplan false \
+  --generate_3d_floorplan false \
   --generate_2d_heatmap false \
-  --generate_3d_heatmap true
+  --vertical_planes "XZ" \
+  --xz_cuts "15.0" \
+  --interactive_heatmaps true \
+  --generate_3d_heatmap false

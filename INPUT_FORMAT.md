@@ -8,6 +8,8 @@ There are three main configuration files which are in `yaml` format. `yaml` is d
 3. `power_config_file` : yaml file containing information about power sources in the 2.5D/3D chiplets.
 4. `power_sequence_file` : csv file with power traces for each power source defined in `power_config_file`.
 
+In addition, MFIT provides an optional **system specification** file (`system.yml`) that can generate the geometry/power inputs using `tools/build_system.py`. See the `system.yml` section below.
+
 ## 1. Material Properties File
 
 This file contains the material properties of the materials used in the 2.5D/3D chiplets. The file should be in `yaml` format. The file should be formatted as follows:
@@ -64,6 +66,33 @@ layers:
     material: <material_name> # material name defined in material_prop_file
 ```
 
+#### Material Regions (optional)
+Regions let you override the base material inside a layer using rectangular bounds. Regions **must not overlap**.
+
+```yaml
+layers:
+  substrate-link-slice:
+    thickness: 0.1
+    nodes:
+      uniform: true
+      under_chiplet: false
+      x_nodes: 60
+      y_nodes: 90
+    material: substrate
+    regions:
+      - name: silicon_link_h1
+        material: silicon
+        start_x: 13.0
+        start_y: 12.5
+        length_x: 14.0
+        length_y: 5.0
+```
+
+Notes:
+- Region coordinates are **global package coordinates** (mm).
+- Regions are applied by node centerpoint containment.
+- Overlapping regions are invalid and will fail at build time.
+
 ## 3. Power Configuration File
 
 This file contains the information about power sources in the 2.5D/3D chiplets. 
@@ -119,3 +148,49 @@ The file should be formatted as follows:
 <layer_name from `geometry_file`>_<chiplet_name from `power_config_file`>_<block_name from `power_config_file`>, <power values in % of max_power>, <power values in % of max_power>, ...
 ```
 
+
+## 5. System Specification File (system.yml)
+The system specification file is a **higher-level input** that generates the standard geometry/power files.
+
+**Usage:**
+```bash
+python3 tools/build_system.py --system path/to/system.yml --outdir path/to/outdir
+```
+
+**Outputs:**
+- `geometry.generated.yml`
+- `power_cfg.generated.yml`
+- `power_seq.generated.csv`
+
+**Key sections:**
+```yaml
+version: 1
+package: {x_length: 40.0, y_length: 60.0, bc_top_htc: 1200, bc_bottom_htc: 20}
+stack:
+  substrate: {layers: [...]}
+  ubump: {layers: [...]}
+  chip: {layers: {...}}
+  tim: {layers: [...]}
+  lid: {layers: [...]}
+chips: [...]            # chiplet placement
+power_traces: {...}     # optional trace definitions
+power_blocks: [...]     # per-chip power blocks
+```
+
+The `stack.*.layers` entries are translated into the `geometry.generated.yml` structure, while `chips`, `power_traces`, and `power_blocks` become `power_cfg.generated.yml` and `power_seq.generated.csv`.
+
+## 6. Manual Granularity Updates (per-body)
+To increase node granularity for a **single body** without re-running `build_system.py`, edit the generated files directly:
+
+1. **Geometry**: Update the target layer’s node grid in `geometry.generated.yml`.
+2. **Power config (heterogeneous chiplets)**: If the layer is `under_chiplet: true`, update the per‑chiplet `nodes_x`/`nodes_y` in `power_cfg.generated.yml` for the body you want to refine.
+
+Example (single chiplet refinement in `power_cfg.generated.yml`):
+```yaml
+ubump:
+  chiplet_1:
+    nodes_x: 316
+    nodes_y: 633
+```
+
+This is a one‑off workflow; re-running `build_system.py` will overwrite these edits.

@@ -127,6 +127,30 @@ There are four main input configuration files which are used to run the thermal 
 
 more details about the format of these files is available in the [input_format.md](INPUT_FORMAT.md) file.
 
+### System Specification Workflow (system.yml)
+For complex packages, you can describe the system with a single `system.yml` and generate the standard inputs:
+
+```bash
+python3 tools/build_system.py --system path/to/system.yml --outdir path/to/output_dir
+```
+
+This produces:
+- `geometry.generated.yml`
+- `power_cfg.generated.yml`
+- `power_seq.generated.csv`
+
+You can then pass those generated files to `thermal_RC.py`. This is the preferred path for multi-chiplet packages with regions, as it keeps placement, materials, and power in one compact spec.
+
+### Visualization Flags
+Use these CLI flags to control what gets generated:
+
+- `--generate_2d_floorplan {True,False}`: 2D layer/power floorplans → `output/RC/floorplan/2d/`
+- `--generate_3d_floorplan {True,False}`: 3D floorplan HTML → `output/RC/floorplan/3d/`
+- `--generate_2d_heatmap {True,False}`: XY layer heatmaps → `output/RC/heatmaps/XY_heatmaps/`
+- `--generate_3d_heatmap {True,False}`: 3D temperature HTML → `output/RC/heatmaps/3d/plotly/`
+- `--vertical_planes "XZ,YZ"` with `--xz_cuts` / `--yz_cuts`: vertical cut PNGs → `output/RC/heatmaps/{XZ|YZ}_heatmaps/`
+- `--interactive_heatmaps {True,False}`: interactive vertical HTML → `output/RC/heatmaps/{XZ|YZ}_interactive/`
+
 ### Outputs
 The model generates the following outputs:
 1. 2D floorplan of each layer in the 2.5D/3D chiplet with the node numbers in `<output_dir>/output/RC/floorplan/2d/` directory.

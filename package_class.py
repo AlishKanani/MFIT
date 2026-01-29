@@ -542,13 +542,20 @@ class Chiplet_package:
         
         temperature_all_map = self.temperature_all_save.T
 
-        if self.args.generate_2d_heatmap:
+        needs_heatmap = (
+            self.args.generate_2d_heatmap or
+            (hasattr(self.args, 'vertical_planes') and self.args.vertical_planes) or
+            (hasattr(self.args, 'generate_3d_heatmap') and self.args.generate_3d_heatmap)
+        )
+
+        if needs_heatmap:
             if self.visualizer is None:
                 self.visualizer = PackageVisualizer(self)
-            
+
             index_heatmap = int(self.args.time_heatmap/self.args.time_step)
             temperature_all_map_celsius = temperature_all_map - 273.15
-            
+
+        if self.args.generate_2d_heatmap:
             # Generate 2D layer heatmaps using new visualizer
             num_nodes = 0
             for layer in self.layers:
@@ -557,17 +564,13 @@ class Chiplet_package:
                 layer_end = num_nodes
                 layer_temps = temperature_all_map_celsius[layer_start:layer_end, index_heatmap]
                 self.visualizer.plot_layer_heatmap(layer, layer_temps)
-            
-            # Generate vertical heatmaps if requested
-            if hasattr(self.args, 'vertical_planes') and self.args.vertical_planes:
-                self.visualizer.generate_vertical_heatmaps(temperature_all_map_celsius, index_heatmap)
+
+        # Generate vertical heatmaps if requested (independent of XY heatmaps)
+        if hasattr(self.args, 'vertical_planes') and self.args.vertical_planes:
+            self.visualizer.generate_vertical_heatmaps(temperature_all_map_celsius, index_heatmap)
         
         # Generate 3D visualization if requested
         if hasattr(self.args, 'generate_3d_heatmap') and self.args.generate_3d_heatmap:
-            if self.visualizer is None:
-                self.visualizer = PackageVisualizer(self)
-            index_heatmap = int(self.args.time_heatmap/self.args.time_step)
-            temperature_all_map_celsius = temperature_all_map - 273.15
             self.visualizer.plot_3d_heatmap(temperature_all_map_celsius, index_heatmap)
 
         num_nodes = 0
