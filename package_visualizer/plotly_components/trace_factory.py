@@ -81,6 +81,42 @@ def create_mesh_trace(vertices_x, vertices_y, vertices_z, intensities,
     )
 
 
+def create_solid_mesh_trace(vertices_x, vertices_y, vertices_z,
+                            i_indices, j_indices, k_indices,
+                            body_name, color,
+                            show_legend=True, legendgroup=None,
+                            hover_texts=None, hover_template=None):
+    """
+    Create a Mesh3d trace with a single solid color.
+    """
+    if go is None:
+        raise ImportError("plotly is required for mesh trace creation")
+    text_values = hover_texts if hover_texts else [body_name] * len(vertices_x)
+    default_hover = '%{text}<extra></extra>'
+
+    return go.Mesh3d(
+        x=vertices_x,
+        y=vertices_y,
+        z=vertices_z,
+        i=i_indices,
+        j=j_indices,
+        k=k_indices,
+        color=color,
+        name=body_name,
+        flatshading=True,
+        lighting=dict(
+            ambient=0.8,
+            diffuse=0.8,
+            specular=0.2,
+            roughness=0.9
+        ),
+        hovertemplate=hover_template or default_hover,
+        text=text_values,
+        showlegend=show_legend,
+        legendgroup=legendgroup or body_name
+    )
+
+
 def create_edge_trace(edge_x, edge_y, edge_z, body_name, 
                      color='lightgray', width=1):
     """

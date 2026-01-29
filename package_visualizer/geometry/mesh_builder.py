@@ -3,16 +3,17 @@ Mesh geometry utilities for building 3D visualizations from node data.
 """
 
 
-def collect_body_data(layers, package, temperature_all_map, index_heatmap,
-                      ambient_temp_c=26.85, ambient_tol=1e-6):
+def collect_body_data(layers, package, temperature_all_map=None, index_heatmap=0,
+                      ambient_temp_c=26.85, ambient_tol=1e-6, split_by_region=False):
     """
     Collect all nodes organized by body membership.
     
     Args:
         layers: List of Layer_chiplet instances
         package: Chiplet_package instance
-        temperature_all_map: Temperature array (nodes x timesteps) in Celsius
+        temperature_all_map: Temperature array (nodes x timesteps) in Celsius (optional)
         index_heatmap: Timestep index to visualize
+        split_by_region: If True, split layer bodies by material regions
     
     Returns:
         Dictionary mapping body_name -> list of node data dicts
@@ -34,18 +35,30 @@ def collect_body_data(layers, package, temperature_all_map, index_heatmap,
         num_nodes += layer.layer_total_nodes()
         
         # Determine which body this layer belongs to
-        body_name = body_membership.get(layer.layer_name, layer.layer_name)
-        
-        if body_name not in body_data:
-            body_data[body_name] = []
+        base_body_name = body_membership.get(layer.layer_name, layer.layer_name)
         
         # Collect node information
         if layer.is_layer_under_chiplet() and not layer.args.is_homogeneous:
             for i in range(layer.total_nodes):
                 node = layer.nodes[i]
                 global_temp_idx = layer_start + i
-                temp = temperature_all_map[global_temp_idx, index_heatmap]
-                is_ambient = abs(temp - ambient_temp_c) <= ambient_tol
+                if temperature_all_map is None:
+                    temp = ambient_temp_c
+                    is_ambient = True
+                else:
+                    temp = temperature_all_map[global_temp_idx, index_heatmap]
+                    is_ambient = abs(temp - ambient_temp_c) <= ambient_tol
+
+                if split_by_region and layer.material_regions:
+                    region_name = getattr(node, 'material_region', None)
+                    if region_name:
+                        body_name = f"{base_body_name}:{region_name}"
+                    else:
+                        body_name = f"{base_body_name}:base"
+                else:
+                    body_name = base_body_name
+                if body_name not in body_data:
+                    body_data[body_name] = []
                 
                 body_data[body_name].append({
                     'x_min': node.x,
@@ -60,14 +73,31 @@ def collect_body_data(layers, package, temperature_all_map, index_heatmap,
                     'global_idx': global_temp_idx,
                     'layer_name': layer.layer_name,
                     'body_name': body_name,
+                    'material_name': getattr(node, 'material_name', None),
+                    'material_region': getattr(node, 'material_region', None),
                 })
         else:
             for i in range(layer.total_x_nodes):
                 for j in range(layer.total_y_nodes):
                     node = layer.nodes[i][j]
                     global_temp_idx = layer_start + i * layer.total_y_nodes + j
-                    temp = temperature_all_map[global_temp_idx, index_heatmap]
-                    is_ambient = abs(temp - ambient_temp_c) <= ambient_tol
+                    if temperature_all_map is None:
+                        temp = ambient_temp_c
+                        is_ambient = True
+                    else:
+                        temp = temperature_all_map[global_temp_idx, index_heatmap]
+                        is_ambient = abs(temp - ambient_temp_c) <= ambient_tol
+
+                    if split_by_region and layer.material_regions:
+                        region_name = getattr(node, 'material_region', None)
+                        if region_name:
+                            body_name = f"{base_body_name}:{region_name}"
+                        else:
+                            body_name = f"{base_body_name}:base"
+                    else:
+                        body_name = base_body_name
+                    if body_name not in body_data:
+                        body_data[body_name] = []
                     
                     body_data[body_name].append({
                         'x_min': node.x,
@@ -82,6 +112,8 @@ def collect_body_data(layers, package, temperature_all_map, index_heatmap,
                         'global_idx': global_temp_idx,
                         'layer_name': layer.layer_name,
                         'body_name': body_name,
+                        'material_name': getattr(node, 'material_name', None),
+                        'material_region': getattr(node, 'material_region', None),
                     })
     
     return body_data

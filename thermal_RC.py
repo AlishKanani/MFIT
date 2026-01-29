@@ -28,7 +28,8 @@ def parse_args():
     parser.add_argument('--use_tuned_C', type=lambda x: (str(x).lower() in ['true','1', 'yes']), default=False, help='Use tuned C matrix for simulation')
 
     # Visualization arguments
-    parser.add_argument('--generate_floorplan', type=lambda x: (str(x).lower() in ['true','1', 'yes']), default=False, help='Generate floorplan images (slow for large node counts)')
+    parser.add_argument('--generate_2d_floorplan', type=lambda x: (str(x).lower() in ['true','1', 'yes']), default=False, help='Generate 2D floorplan images (slow for large node counts)')
+    parser.add_argument('--generate_3d_floorplan', type=lambda x: (str(x).lower() in ['true','1', 'yes']), default=False, help='Generate 3D floorplan visualization (Plotly HTML)')
     parser.add_argument('--generate_2d_heatmap', type=lambda x: (str(x).lower() in ['true','1', 'yes']), default=True, help='Generate 2D layer heatmaps of final temperature')
     parser.add_argument('--time_heatmap', type=float, default=4, help='Time for heatmap generation in sec')
     parser.add_argument('--vertical_planes', type=str, default='', help='Comma-separated list of vertical planes to generate (XZ, YZ, or XZ,YZ)')
@@ -79,12 +80,16 @@ if __name__ == '__main__':
     package.connect_nodes()
     connect_nodes_time = time.time() - t0
 
-    if args.generate_floorplan:
+    floorplan_2d_time = 0.0
+    floorplan_3d_time = 0.0
+    if args.generate_2d_floorplan:
         t0 = time.time()
-        package.generate_floorplan()
-        floorplan_time = time.time() - t0
-    else:
-        floorplan_time = 0.0
+        package.generate_floorplan_2d()
+        floorplan_2d_time = time.time() - t0
+    if args.generate_3d_floorplan:
+        t0 = time.time()
+        package.generate_floorplan_3d()
+        floorplan_3d_time = time.time() - t0
 
     # Python SuperLU solver (fast, sparse-aware)
     t0 = time.time()
@@ -158,7 +163,8 @@ if __name__ == '__main__':
             "xy_conductance_s": float(rc_timing.get("xy_conductance_s", 0.0)),
             "z_conductance_s": float(rc_timing.get("z_conductance_s", 0.0)),
             "connect_nodes_s": float(connect_nodes_time),
-            "generate_floorplan_s": float(floorplan_time),
+            "generate_floorplan_2d_s": float(floorplan_2d_time),
+            "generate_floorplan_3d_s": float(floorplan_3d_time),
             "set_initial_conditions_s": float(init_time),
             "factorization_s": float(factor_time),
             "solver_loop_s": float(solve_time),

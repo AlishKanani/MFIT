@@ -468,17 +468,27 @@ class Chiplet_package:
                 self.capacitance_all[layer_start:layer_end] = intial_C_guess[8]*self.capacitance_all[layer_start:layer_end]
     
     def generate_floorplan(self):
-        # generate the floorplan of the package, and chiplet
+        # generate the floorplan of the package, and chiplet (legacy 2D)
+        return self.generate_floorplan_2d()
+
+    def generate_floorplan_2d(self):
+        # generate the 2D floorplan of the package and chiplet
         num_nodes = 0
         for layer in self.layers:
             layer.plot_layer(utils=self.common_utils, layer_start=num_nodes)
             num_nodes += layer.layer_total_nodes()
+
+    def generate_floorplan_3d(self):
+        """Generate floorplan using the 3D visualizer."""
+        if self.visualizer is None:
+            self.visualizer = PackageVisualizer(self)
+        self.visualizer.plot_3d_floorplan()
     
     def generate_floorplan_visual(self):
         """Generate floorplan using the new visualizer."""
         if self.visualizer is None:
             self.visualizer = PackageVisualizer(self)
-        self.visualizer.generate_floorplan_visual()
+        self.visualizer.generate_floorplan_2d()
 
     def package_total_nodes(self):
         total_nodes = 0

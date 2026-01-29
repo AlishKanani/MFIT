@@ -308,6 +308,44 @@ def create_mode_buttons(n_traces, mesh_indices, edge_indices, flux_indices):
     ]
 
 
+def create_floorplan_mode_buttons(n_traces, mesh_indices, edge_indices):
+    """
+    Create Solid/Wireframe/Both mode toggle buttons for floorplans.
+    """
+    solid_visible = [False] * n_traces
+    wire_visible = [False] * n_traces
+    both_visible = [False] * n_traces
+
+    mesh_set = set(mesh_indices)
+    edge_set = set(edge_indices)
+
+    for idx in range(n_traces):
+        if idx in mesh_set:
+            solid_visible[idx] = True
+            both_visible[idx] = True
+        if idx in edge_set:
+            wire_visible[idx] = True
+            both_visible[idx] = True
+
+    return [
+        dict(
+            label="Solid",
+            method="restyle",
+            args=["visible", solid_visible],
+        ),
+        dict(
+            label="Wireframe",
+            method="restyle",
+            args=["visible", wire_visible],
+        ),
+        dict(
+            label="Both",
+            method="restyle",
+            args=["visible", both_visible],
+        ),
+    ]
+
+
 def create_visibility_buttons(n_traces):
     """
     Create Show All / Hide All body visibility buttons.
@@ -337,7 +375,7 @@ def create_3d_layout(
     package_bounds,
     sliders,
     buttons_visibility,
-    buttons_mode,
+    buttons_mode=None,
     width=1200,
     height=900
 ):
@@ -416,21 +454,24 @@ def create_3d_layout(
                 borderwidth=1,
                 pad=dict(t=5, b=5, l=5, r=5)
             ),
-            dict(
-                type="buttons",
-                direction="right",
-                x=0.5,
-                y=1.02,
-                xanchor='center',
-                yanchor='bottom',
-                buttons=buttons_mode,
-                showactive=True,
-                bgcolor='rgba(255, 255, 255, 0.9)',
-                bordercolor='gray',
-                borderwidth=1,
-                pad=dict(t=5, b=5, l=5, r=5)
-            ),
-        ],
+        ] + (
+            [
+                dict(
+                    type="buttons",
+                    direction="right",
+                    x=0.5,
+                    y=1.02,
+                    xanchor='center',
+                    yanchor='bottom',
+                    buttons=buttons_mode,
+                    showactive=True,
+                    bgcolor='rgba(255, 255, 255, 0.9)',
+                    bordercolor='gray',
+                    borderwidth=1,
+                    pad=dict(t=5, b=5, l=5, r=5)
+                )
+            ] if buttons_mode else []
+        ),
         legend=dict(
             x=0.01,
             y=0.99,

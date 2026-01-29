@@ -27,6 +27,7 @@ python3 "$mfroot/thermal_RC.py" \
   --power_interval 1 \
   --time_step 1 \
   --time_heatmap 100 \
-  --generate_floorplan false \
+  --generate_2d_floorplan true \
+  --generate_3d_floorplan true \
   --generate_2d_heatmap false \
   --generate_3d_heatmap true

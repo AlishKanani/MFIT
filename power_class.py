@@ -109,9 +109,9 @@ class Power_layer:
         plt.xlabel('X dimension (mm)')
         plt.ylabel('Y dimension (mm)')
 
-        # Save to output/RC/floorplan directory
+        # Save to output/RC/floorplan/2d directory
         rc_dir = getattr(self.args, "output_rc_dir", os.path.join(self.args.output_dir, "output", "RC"))
-        floorplan_dir = os.path.join(rc_dir, 'floorplan')
+        floorplan_dir = os.path.join(rc_dir, 'floorplan', '2d')
         os.makedirs(floorplan_dir, exist_ok=True)
 
         fig.savefig(os.path.join(floorplan_dir, self.name + '_power_' + '.png'), dpi=300, bbox_inches='tight')
@@ -134,7 +134,7 @@ class Power_grid:
     
     def create_power_seq_grid(self, utils):
         for layer in self.power_layers:
-            if self.args.generate_floorplan:
+            if self.args.generate_2d_floorplan:
                 layer.plot_layer(utils)
             layer.create_power_seq_layer(self.power_seq)
 

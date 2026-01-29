@@ -63,6 +63,11 @@ class Layer_chiplet:
             regions.append(MaterialRegion(region_cfg, default_name))
         return regions
 
+    @staticmethod
+    def _set_node_material_tag(node, material_name, region_name=None):
+        node.material_name = material_name
+        node.material_region = region_name
+
     def is_power_src(self):
         return self.power_src
         
@@ -132,6 +137,7 @@ class Layer_chiplet:
                                                 x_length=x_length,
                                                 y_length=y_length,
                                                 thickness=self.thickness)
+                        self._set_node_material_tag(self.nodes[i][j], self.material)
         
             else:
                 # non uniform nodes, not under chiplet
@@ -165,6 +171,7 @@ class Layer_chiplet:
                                                 x_length=x_length,
                                                 y_length=y_length,
                                                 thickness=self.thickness)
+                        self._set_node_material_tag(self.nodes[i][j], self.material)
 
         elif self.is_layer_under_chiplet() and self.args.is_homogeneous:
             # if layer is under chiplet, chiplets can be homogeneous or non homogeneous
@@ -214,6 +221,10 @@ class Layer_chiplet:
                                                                                                         x_length=x_length,
                                                                                                         y_length=y_length,
                                                                                                         thickness=self.thickness)
+                                self._set_node_material_tag(
+                                    self.nodes[i_chiplet*len(x_nodes) + i][j_chiplet*len(y_nodes) + j],
+                                    self.material
+                                )
             
             elif self.is_uniform():
                 # for homogeneous chiplets, with uniform nodes add logic to create nodes - read from geometry file
@@ -259,6 +270,10 @@ class Layer_chiplet:
                                                                                                         x_length=x_length,
                                                                                                         y_length=y_length,
                                                                                                         thickness=self.thickness)
+                                self._set_node_material_tag(
+                                    self.nodes[i_chiplet*x_nodes_chiplet + i][j_chiplet*y_nodes_chiplet + j],
+                                    self.material
+                                )
             
         elif self.is_layer_under_chiplet() and not self.args.is_homogeneous:
             # for non homogeneous chiplets, only uniform nodes are supported 
@@ -302,8 +317,10 @@ class Layer_chiplet:
                 
                 if hasattr(chiplets, 'material'):
                     chiplet_material = material_properties[chiplets.material]
+                    chiplet_material_name = chiplets.material
                 else:
                     chiplet_material = self.layer_material_properties
+                    chiplet_material_name = self.material
 
                 for i in range(chiplets.nodes_x):
                     for j in range(chiplets.nodes_y):
@@ -315,6 +332,10 @@ class Layer_chiplet:
                                                                 thickness=self.thickness,
                                                                 material_properties=chiplet_material,
                                                                 is_power_src=chiplets.is_power_src)
+                        self._set_node_material_tag(
+                            self.nodes[prev_nodes + i*chiplets.nodes_y + j],
+                            chiplet_material_name
+                        )
                         
                 prev_nodes = prev_nodes + x_nodes_c*y_nodes_c
 
@@ -370,6 +391,7 @@ class Layer_chiplet:
                         matched_region = region
                 if matched_region and matched_region.material in material_properties:
                     node.material_properties = material_properties[matched_region.material]
+                    self._set_node_material_tag(node, matched_region.material, matched_region.name)
         else:
             # 2D node array (homogeneous or non-chiplet layers)
             for i in range(self.total_x_nodes):
@@ -390,6 +412,7 @@ class Layer_chiplet:
                             matched_region = region
                     if matched_region and matched_region.material in material_properties:
                         node.material_properties = material_properties[matched_region.material]
+                        self._set_node_material_tag(node, matched_region.material, matched_region.name)
     
     def connect_nodes(self):
         # 1. each layer would create 1D and 2D array for capacitance and resistance. 
@@ -706,9 +729,9 @@ class Layer_chiplet:
         plt.xlabel('X dimension (mm)')
         plt.ylabel('Y dimension (mm)')
 
-        # Save to output/RC/floorplan directory
+        # Save to output/RC/floorplan/2d directory
         rc_dir = getattr(self.args, "output_rc_dir", os.path.join(self.args.output_dir, "output", "RC"))
-        floorplan_dir = os.path.join(rc_dir, 'floorplan')
+        floorplan_dir = os.path.join(rc_dir, 'floorplan', '2d')
         os.makedirs(floorplan_dir, exist_ok=True)
 
         fig.savefig(os.path.join(floorplan_dir, self.layer_name + '.png'), dpi=300, bbox_inches='tight')

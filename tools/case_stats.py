@@ -114,7 +114,8 @@ def write_case_stats(
             "use_tuned_C": bool(getattr(args, "use_tuned_C", False)),
         },
         "outputs": {
-            "generate_floorplan": bool(getattr(args, "generate_floorplan", False)),
+            "generate_2d_floorplan": bool(getattr(args, "generate_2d_floorplan", False)),
+            "generate_3d_floorplan": bool(getattr(args, "generate_3d_floorplan", False)),
             "generate_2d_heatmap": bool(getattr(args, "generate_2d_heatmap", False)),
             "time_heatmap_s": float(getattr(args, "time_heatmap", 0.0)),
             "vertical_planes": getattr(args, "vertical_planes", ""),
