@@ -504,7 +504,11 @@ class Layer_chiplet:
         return self.z_plus_conductance + self.z_minus_conductance
     
     def write_temperature_to_file(self, block_temperatures, ts):
-        file_name = f'{self.args.output_dir}/output/temperature_{self.layer_name}_{ts}.csv'
+        # Use new output/RC/ directory structure
+        rc_dir = getattr(self.args, "output_rc_dir", os.path.join(self.args.output_dir, "output", "RC"))
+        os.makedirs(rc_dir, exist_ok=True)
+        
+        file_name = os.path.join(rc_dir, f'temperature_{self.layer_name}_{ts}.csv')
         with open(file_name, 'w') as f:
             for block_temperature in block_temperatures:
                 f.write(','.join([str(i) for i in block_temperature]) + '\n')
@@ -607,12 +611,12 @@ class Layer_chiplet:
         plt.xlabel('X dimension (mm)')
         plt.ylabel('Y dimension (mm)')
 
-        # check if floorplan directory exists, if not create it
+        # Save to output/RC/floorplan directory
+        rc_dir = getattr(self.args, "output_rc_dir", os.path.join(self.args.output_dir, "output", "RC"))
+        floorplan_dir = os.path.join(rc_dir, 'floorplan')
+        os.makedirs(floorplan_dir, exist_ok=True)
 
-        if not os.path.exists(self.args.output_dir + '/floorplan'):
-            os.makedirs(self.args.output_dir + '/floorplan')
-
-        fig.savefig(self.args.output_dir + '/floorplan/' + self.layer_name + '.png', dpi=300, bbox_inches='tight')
+        fig.savefig(os.path.join(floorplan_dir, self.layer_name + '.png'), dpi=300, bbox_inches='tight')
         plt.close(fig)
 
     def get_nodes_at_cut(self, cut_value, plane_type):

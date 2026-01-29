@@ -1,11 +1,13 @@
 import common
 from power_class import Power_grid
 from package_class import Chiplet_package
+from tools.case_stats import write_case_stats, CaseStatsInputs
 import numpy as np
 from scipy.sparse import csc_matrix
 from scipy.sparse.linalg import splu
 import time
 import argparse
+import os
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -27,7 +29,7 @@ def parse_args():
 
     # Visualization arguments
     parser.add_argument('--generate_floorplan', type=lambda x: (str(x).lower() in ['true','1', 'yes']), default=False, help='Generate floorplan images (slow for large node counts)')
-    parser.add_argument('--generate_heatmap', type=lambda x: (str(x).lower() in ['true','1', 'yes']), default=True, help='Generate heatmap of final temperature')
+    parser.add_argument('--generate_2d_heatmap', type=lambda x: (str(x).lower() in ['true','1', 'yes']), default=True, help='Generate 2D layer heatmaps of final temperature')
     parser.add_argument('--time_heatmap', type=float, default=4, help='Time for heatmap generation in sec')
     parser.add_argument('--vertical_planes', type=str, default='', help='Comma-separated list of vertical planes to generate (XZ, YZ, or XZ,YZ)')
     parser.add_argument('--xz_cuts', type=str, default='', help='Comma-separated Y values for XZ plane cuts (e.g., 1.5,3.0,5.5)')
@@ -43,6 +45,15 @@ if __name__ == '__main__':
     start = time.time()
 
     args = parse_args()
+    
+    # ---- Output layout ----
+    # Top-level: <output_dir>/{floorplan, heatmaps, ...}
+    # Simulation outputs: <output_dir>/output/{RC,DSS}/...
+    args.output_root = os.path.join(args.output_dir, "output")
+    args.output_rc_dir = os.path.join(args.output_root, "RC")
+    args.output_dss_dir = os.path.join(args.output_root, "DSS")
+    os.makedirs(args.output_rc_dir, exist_ok=True)
+    os.makedirs(args.output_dss_dir, exist_ok=True)
 
     material_properties = common.load_dict_yaml(args.material_prop_file)
 
@@ -94,7 +105,6 @@ if __name__ == '__main__':
     A_csc = csc_matrix(A)
     slu = splu(A_csc)
     factor_time = time.time() - factor_start
-    print(f"Factorization took {factor_time:.3f}s")
     
     def solve_A(rhs):
         return slu.solve(rhs)
@@ -137,12 +147,36 @@ if __name__ == '__main__':
     save_time = time.time() - t0
     
     total_time = time.time() - start
-    print(f'\nTime breakdown:')
-    print(f'  Create layers: {create_layers_time:.3f}s')
-    print(f'  Connect nodes (RC assembly): {connect_nodes_time:.3f}s')
-    print(f'  Generate floorplan: {floorplan_time:.3f}s')
-    print(f'  Set initial conditions: {init_time:.3f}s')
-    print(f'  Factorization: {factor_time:.3f}s')
-    print(f'  Time-stepping: {solve_time:.3f}s')
-    print(f'  Save & visualizations: {save_time:.3f}s')
-    print(f'  Total: {total_time:.3f}s')
+    print(f'\nTotal simulation time: {total_time:.3f}s')
+    
+    # ---- Case stats (written by simulator, not run scripts) ----
+    try:
+        rc_timing = getattr(package, "rc_timing", {}) or {}
+        timing_summary = {
+            "elapsed_total_s": float(total_time),
+            "create_layers_s": float(create_layers_time),
+            "xy_conductance_s": float(rc_timing.get("xy_conductance_s", 0.0)),
+            "z_conductance_s": float(rc_timing.get("z_conductance_s", 0.0)),
+            "connect_nodes_s": float(connect_nodes_time),
+            "generate_floorplan_s": float(floorplan_time),
+            "set_initial_conditions_s": float(init_time),
+            "factorization_s": float(factor_time),
+            "solver_loop_s": float(solve_time),
+            "save_outputs_s": float(save_time),
+        }
+        stats_path = write_case_stats(
+            output_dir=args.output_rc_dir,
+            args=args,
+            package=package,
+            geometry_dict=geometry_dict,
+            inputs=CaseStatsInputs(
+                elapsed_wall_s=total_time,
+                simulated_steps=n_steps,
+                dt_s=dt,
+                timing=timing_summary,
+            ),
+        )
+        print(f"\nWrote case stats: {stats_path}")
+    except Exception as e:
+        print(f"\nWarning: failed to write case stats: {e}")
+        stats_path = None

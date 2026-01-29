@@ -109,12 +109,12 @@ class Power_layer:
         plt.xlabel('X dimension (mm)')
         plt.ylabel('Y dimension (mm)')
 
-        # check if floorplan directory exists, if not create it
+        # Save to output/RC/floorplan directory
+        rc_dir = getattr(self.args, "output_rc_dir", os.path.join(self.args.output_dir, "output", "RC"))
+        floorplan_dir = os.path.join(rc_dir, 'floorplan')
+        os.makedirs(floorplan_dir, exist_ok=True)
 
-        if not os.path.exists(self.args.output_dir + '/floorplan'):
-            os.makedirs(self.args.output_dir + '/floorplan')
-
-        fig.savefig(self.args.output_dir + '/floorplan/' + self.name + '_power_' + '.png', dpi=300, bbox_inches='tight')
+        fig.savefig(os.path.join(floorplan_dir, self.name + '_power_' + '.png'), dpi=300, bbox_inches='tight')
         plt.close()
 
 
@@ -134,7 +134,7 @@ class Power_grid:
     
     def create_power_seq_grid(self, utils):
         for layer in self.power_layers:
-            if self.args.generate_heatmap:
+            if self.args.generate_floorplan:
                 layer.plot_layer(utils)
             layer.create_power_seq_layer(self.power_seq)
 

@@ -106,11 +106,17 @@ python thermal_RC.py --material_prop_file <path to material property yaml file> 
                      --total_duration <Total duration for transient simulation in sec> \ # should match power sequence length
                      --use_tuned_C {True,False} \ # True if using tuned Capacitance values for each layer
 
-                     --generate_heatmap {True,False} \
-                     --time_heatmap <Time for heatmap generation in sec> 
+                     --generate_floorplan {True,False} \ # generates layer and power source floorplans
+                     --generate_2d_heatmap {True,False} \ # generates 2D layer heatmaps
+                     --time_heatmap <Time for heatmap generation in sec> \
+                     --vertical_planes {XZ,YZ,XZ,YZ} \ # comma-separated list of vertical cut planes
+                     --xz_cuts <Y values for XZ cuts> \ # comma-separated (e.g., 1.5,3.0,5.5)
+                     --yz_cuts <X values for YZ cuts> \ # comma-separated (e.g., 2.0,4.0)
+                     --interactive_heatmaps {True,False} \ # generates interactive HTML for vertical cuts
+                     --generate_3d_heatmap {True,False} # generates interactive 3D Plotly visualization
 
 ```
-Note: For timing analysis, turn off the `generate_heatmap` and `generate_DSS` flags.
+Note: For timing analysis, turn off the `generate_2d_heatmap` and `generate_DSS` flags.
 
 ### Inputs
 There are four main input configuration files which are used to run the thermal RC model:
@@ -124,12 +130,13 @@ more details about the format of these files is available in the [input_format.m
 
 ### Outputs
 The model generates the following outputs:
-1. Floorplan of each layer in the 2.5D/3D chiplet with the node numbers in `<output_dir>/floorplan/` directory.
-2. Floorplan of power sources in the 2.5D/3D chiplet in `<output_dir>/floorplan/` directory.
-3. Temperature of each node in the 2.5D/3D chiplet at each time step. The output is saved in `<output_dir>/output/temperature_all_<time_step>.csv` file.
-4. Average temperature of each chiplet at each time step. The output is saved in `<output_dir>/output/temperature_<chiplet_layer>_<time_step>.csv` file.
-5. Output file with the A and B matrices and mapped power for all nodes for the DSS model in `<output_dir>/output/` directory.
-6. Heatmap of the temperature of each layer at a specific time step in `<output_dir>/heatmaps/` directory.
+1. Floorplan of each layer in the 2.5D/3D chiplet with the node numbers in `<output_dir>/output/RC/floorplan/` directory.
+2. Floorplan of power sources in the 2.5D/3D chiplet in `<output_dir>/output/RC/floorplan/` directory.
+3. Temperature of each node in the 2.5D/3D chiplet at each time step. The output is saved in `<output_dir>/output/RC/temperature_all_<time_step>.csv` file.
+4. Average temperature of each chiplet at each time step. The output is saved in `<output_dir>/output/RC/temperature_<chiplet_layer>_<time_step>.csv` file.
+5. Output file with the A and B matrices and mapped power for all nodes for the DSS model in `<output_dir>/output/DSS/` directory.
+6. Case statistics summary with timing and model details in `<output_dir>/output/RC/case_stats.yml` file.
+7. Heatmap of the temperature of each layer at a specific time step in `<output_dir>/heatmaps/` directory.
 
 
 ### DSS Model

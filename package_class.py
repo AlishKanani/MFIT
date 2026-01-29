@@ -511,23 +511,28 @@ class Chiplet_package:
         discrete_A = d_sys.A
         discrete_B = d_sys.B
         
-        if not os.path.exists(self.args.output_dir + '/output'):
-            os.makedirs(self.args.output_dir + '/output')
+        # Use new output/DSS/ directory structure
+        dss_dir = getattr(self.args, "output_dss_dir", os.path.join(self.args.output_dir, "output", "DSS"))
+        os.makedirs(dss_dir, exist_ok=True)
 
-        np.savetxt(self.args.output_dir + '/output/disc_A_matrix.csv', discrete_A, delimiter=',')
-        np.savetxt(self.args.output_dir + '/output/disc_B_matrix.csv', discrete_B, delimiter=',')
+        np.savetxt(os.path.join(dss_dir, 'disc_A_matrix.csv'), discrete_A, delimiter=',')
+        np.savetxt(os.path.join(dss_dir, 'disc_B_matrix.csv'), discrete_B, delimiter=',')
 
     def write_temperature_to_file(self, ts):
         self.temperature_all_save = np.array(self.temperature_all_save) + self.common_utils.ambient_temp
 
+        # Use new output/RC/ directory structure
+        rc_dir = getattr(self.args, "output_rc_dir", os.path.join(self.args.output_dir, "output", "RC"))
+        os.makedirs(rc_dir, exist_ok=True)
+        
         # save the temperature to a file
-        file_name = f'{self.args.output_dir}/output/temperature_all_{ts}.csv'
+        file_name = os.path.join(rc_dir, f'temperature_all_{ts}.csv')
         np.savetxt(file_name, self.temperature_all_save, delimiter=',')
 
         
         temperature_all_map = self.temperature_all_save.T
 
-        if self.args.generate_heatmap:
+        if self.args.generate_2d_heatmap:
             if self.visualizer is None:
                 self.visualizer = PackageVisualizer(self)
             
@@ -580,9 +585,8 @@ class Chiplet_package:
 
         # if dss
         if self.args.generate_DSS:
-            # export power to csv file
-            output_dir = self.args.output_dir + '/output'
-            if not os.path.exists(output_dir):
-                os.makedirs(output_dir)
-            np.savetxt(output_dir + '/power_all.csv', self.power.T, delimiter=',')
+            # export power to csv file - use DSS directory
+            dss_dir = getattr(self.args, "output_dss_dir", os.path.join(self.args.output_dir, "output", "DSS"))
+            os.makedirs(dss_dir, exist_ok=True)
+            np.savetxt(os.path.join(dss_dir, 'power_all.csv'), self.power.T, delimiter=',')
 
