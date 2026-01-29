@@ -10,10 +10,17 @@
 
 
 cd ../
-python thermal_RC.py --material_prop_file material_prop.yml \
+python3 thermal_RC.py --material_prop_file material_prop.yml \
                        --geometry_file example_3_heterogeneous_chiplets/chiplet_geometry_3_chiplets_uniform_nodes.yml \
                        --power_config_file example_3_heterogeneous_chiplets/power_dist_config_heterogeneous.yml \
                        --power_seq_file example_3_heterogeneous_chiplets/power_seq_random_3.csv \
                        --output_dir example_3_heterogeneous_chiplets/ \
-                       --is_homogeneous false
+                       --is_homogeneous false \
+                       --generate_heatmap true \
+                       --time_heatmap 4 \
+                       --vertical_planes "XZ,YZ" \
+                       --xz_cuts "3.0,4.75,6.5" \
+                       --yz_cuts "3.0,4.75,6.5" \
+                       --interactive_heatmaps true \
+                       --generate_3d_heatmap true
 cd -

@@ -5,6 +5,7 @@ import os
 from scipy.signal import lti
 from ctypes import *
 import platform
+from package_visualizer import PackageVisualizer
 
 # load the shared C library, for the entire c-based solver
 # Here check the shared_library extension and load the library accordingly
@@ -44,6 +45,7 @@ class Chiplet_package:
         self.common_utils = utils
         self.power_grid_class = power_grid_class
         self.args = args
+        self.visualizer = None  # Will be initialized after layers are created
     
     def create_layers(self):
         for layer in self.geometry_dict['layers']:
@@ -249,6 +251,12 @@ class Chiplet_package:
         for layer in self.layers:
             layer.plot_layer(utils=self.common_utils, layer_start=num_nodes)
             num_nodes += layer.layer_total_nodes()
+    
+    def generate_floorplan_visual(self):
+        """Generate floorplan using the new visualizer."""
+        if self.visualizer is None:
+            self.visualizer = PackageVisualizer(self)
+        self.visualizer.generate_floorplan_visual()
 
     def package_total_nodes(self):
         total_nodes = 0
@@ -291,14 +299,32 @@ class Chiplet_package:
         temperature_all_map = self.temperature_all_save.T
 
         if self.args.generate_heatmap:
+            if self.visualizer is None:
+                self.visualizer = PackageVisualizer(self)
+            
             index_heatmap = int(self.args.time_heatmap/self.args.time_step)
-            plot_temperature = temperature_all_map[:, index_heatmap] - 273.15  # convert to Celsius
+            temperature_all_map_celsius = temperature_all_map - 273.15
+            
+            # Generate 2D layer heatmaps using new visualizer
             num_nodes = 0
             for layer in self.layers:
                 layer_start = num_nodes
                 num_nodes += layer.layer_total_nodes()
                 layer_end = num_nodes
-                layer.plot_heatmap(plot_temperature[layer_start:layer_end], utils=self.common_utils)
+                layer_temps = temperature_all_map_celsius[layer_start:layer_end, index_heatmap]
+                self.visualizer.plot_layer_heatmap(layer, layer_temps)
+            
+            # Generate vertical heatmaps if requested
+            if hasattr(self.args, 'vertical_planes') and self.args.vertical_planes:
+                self.visualizer.generate_vertical_heatmaps(temperature_all_map_celsius, index_heatmap)
+        
+        # Generate 3D visualization if requested
+        if hasattr(self.args, 'generate_3d_heatmap') and self.args.generate_3d_heatmap:
+            if self.visualizer is None:
+                self.visualizer = PackageVisualizer(self)
+            index_heatmap = int(self.args.time_heatmap/self.args.time_step)
+            temperature_all_map_celsius = temperature_all_map - 273.15
+            self.visualizer.plot_3d_heatmap(temperature_all_map_celsius, index_heatmap)
 
         num_nodes = 0
         for layer in self.layers:

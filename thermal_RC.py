@@ -20,10 +20,16 @@ def parse_args():
     parser.add_argument('--power_interval', type=float, default=1, help='Power interval for transient simulation in sec')
     parser.add_argument('--total_duration', type=float, default=50, help='Total time for transient simulation in sec')
 
-    parser.add_argument('--use_tuned_C', type=lambda x: (str(x).lower() in ['true','1', 'yes']), default=True, help='Use tuned C matrix for simulation')
+    parser.add_argument('--use_tuned_C', type=lambda x: (str(x).lower() in ['true','1', 'yes']), default=False, help='Use tuned C matrix for simulation')
 
+    # Visualization arguments
     parser.add_argument('--generate_heatmap', type=lambda x: (str(x).lower() in ['true','1', 'yes']), default=True, help='Generate heatmap of final temperature')
     parser.add_argument('--time_heatmap', type=float, default=4, help='Time for heatmap generation in sec')
+    parser.add_argument('--vertical_planes', type=str, default='', help='Comma-separated list of vertical planes to generate (XZ, YZ, or XZ,YZ)')
+    parser.add_argument('--xz_cuts', type=str, default='', help='Comma-separated Y values for XZ plane cuts (e.g., 1.5,3.0,5.5)')
+    parser.add_argument('--yz_cuts', type=str, default='', help='Comma-separated X values for YZ plane cuts (e.g., 2.0,4.0)')
+    parser.add_argument('--interactive_heatmaps', type=lambda x: (str(x).lower() in ['true','1', 'yes']), default=True, help='Generate interactive HTML heatmaps for vertical cuts')
+    parser.add_argument('--generate_3d_heatmap', type=lambda x: (str(x).lower() in ['true','1', 'yes']), default=False, help='Generate interactive 3D Plotly visualization (large file size)')
 
     args = parser.parse_args()
     return args
