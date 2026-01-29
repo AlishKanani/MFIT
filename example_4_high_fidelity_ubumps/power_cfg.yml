@@ -1,0 +1,121 @@
+# Power configuration for 4 chiplets in 2x2 array
+# Chiplet placement and power blocks for non-homogeneous layout
+# distance in mm, power in W
+
+ubump:
+  chiplet_1:
+    start_chiplet_x: 5.0
+    start_chiplet_y: 5.0
+    length_chiplet_x: 10.0
+    length_chiplet_y: 20.0
+    nodes_x: 8
+    nodes_y: 16
+  chiplet_2:
+    start_chiplet_x: 25.0
+    start_chiplet_y: 5.0
+    length_chiplet_x: 10.0
+    length_chiplet_y: 20.0
+    nodes_x: 8
+    nodes_y: 16
+  chiplet_3:
+    start_chiplet_x: 5.0
+    start_chiplet_y: 35.0
+    length_chiplet_x: 10.0
+    length_chiplet_y: 20.0
+    nodes_x: 8
+    nodes_y: 16
+  chiplet_4:
+    start_chiplet_x: 25.0
+    start_chiplet_y: 35.0
+    length_chiplet_x: 10.0
+    length_chiplet_y: 20.0
+    nodes_x: 8
+    nodes_y: 16
+
+chiplet-layer_1:
+  chiplet_1:
+    start_chiplet_x: 5.0
+    start_chiplet_y: 5.0
+    length_chiplet_x: 10.0
+    length_chiplet_y: 20.0
+    nodes_x: 8
+    nodes_y: 16
+    layout_blocks:
+      background:
+        start_point_x: 0.0
+        start_point_y: 0.0
+        length_x: 10.0
+        length_y: 20.0
+        max_power: 70.0
+  chiplet_2:
+    start_chiplet_x: 25.0
+    start_chiplet_y: 5.0
+    length_chiplet_x: 10.0
+    length_chiplet_y: 20.0
+    nodes_x: 8
+    nodes_y: 16
+    layout_blocks:
+      background:
+        start_point_x: 0.0
+        start_point_y: 0.0
+        length_x: 10.0
+        length_y: 20.0
+        max_power: 70.0
+  chiplet_3:
+    start_chiplet_x: 5.0
+    start_chiplet_y: 35.0
+    length_chiplet_x: 10.0
+    length_chiplet_y: 20.0
+    nodes_x: 8
+    nodes_y: 16
+    layout_blocks:
+      background:
+        start_point_x: 0.0
+        start_point_y: 0.0
+        length_x: 10.0
+        length_y: 20.0
+        max_power: 70.0
+  chiplet_4:
+    start_chiplet_x: 25.0
+    start_chiplet_y: 35.0
+    length_chiplet_x: 10.0
+    length_chiplet_y: 20.0
+    nodes_x: 8
+    nodes_y: 16
+    layout_blocks:
+      background:
+        start_point_x: 0.0
+        start_point_y: 0.0
+        length_x: 10.0
+        length_y: 20.0
+        max_power: 70.0
+
+tim-base:
+  chiplet_1:
+    start_chiplet_x: 5.0
+    start_chiplet_y: 5.0
+    length_chiplet_x: 10.0
+    length_chiplet_y: 20.0
+    nodes_x: 8
+    nodes_y: 16
+  chiplet_2:
+    start_chiplet_x: 25.0
+    start_chiplet_y: 5.0
+    length_chiplet_x: 10.0
+    length_chiplet_y: 20.0
+    nodes_x: 8
+    nodes_y: 16
+  chiplet_3:
+    start_chiplet_x: 5.0
+    start_chiplet_y: 35.0
+    length_chiplet_x: 10.0
+    length_chiplet_y: 20.0
+    nodes_x: 8
+    nodes_y: 16
+  chiplet_4:
+    start_chiplet_x: 25.0
+    start_chiplet_y: 35.0
+    length_chiplet_x: 10.0
+    length_chiplet_y: 20.0
+    nodes_x: 8
+    nodes_y: 16

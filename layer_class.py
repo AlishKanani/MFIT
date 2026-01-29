@@ -24,6 +24,9 @@ class Layer_chiplet:
         self.total_y_nodes = None
 
         self.total_nodes = None
+        # For non-homogeneous chiplets, nodes are stored as a 1D list and grouped by chiplet.
+        # Each entry is (start_idx, nodes_x, nodes_y) in the linear node array.
+        self._chiplet_ranges = []
 
     def is_power_src(self):
         return self.power_src
@@ -252,9 +255,12 @@ class Layer_chiplet:
             self.nodes = [None for i in range(self.total_nodes)]
 
             prev_nodes = 0
+            self._chiplet_ranges = []
             for chiplets in geometry_layer.power_chiplets:
                 x_nodes_c = chiplets.nodes_x
                 y_nodes_c = chiplets.nodes_y
+                start_idx = prev_nodes
+                self._chiplet_ranges.append((start_idx, int(x_nodes_c), int(y_nodes_c)))
 
                 x_length = chiplets.length_chiplet_x/x_nodes_c
                 y_length = chiplets.length_chiplet_y/y_nodes_c
@@ -296,7 +302,11 @@ class Layer_chiplet:
             # 1D array of Z resistance, length_x, length_y and x,y coordinates of the nodes
         
         self.capacitance = np.zeros(self.layer_total_nodes())
-        self.xy_conductance = np.zeros((self.layer_total_nodes(), self.layer_total_nodes()))
+        # Sparse assembly: store edge lists instead of dense matrices
+        self.xy_conductance = None
+        self.xy_edges_u = None
+        self.xy_edges_v = None
+        self.xy_edges_g = None
         self.z_conductance = np.zeros(self.layer_total_nodes())
         self.x_lengths = np.zeros(self.layer_total_nodes())
         self.y_lengths = np.zeros(self.layer_total_nodes())
@@ -324,11 +334,34 @@ class Layer_chiplet:
                 if self.nodes[ij].boundary_condition['z-']:
                     self.z_minus_conductance[ij] = self.nodes[ij].convection_conductance*self.nodes[ij].thermal_conductance_z/(self.nodes[ij].convection_conductance + self.nodes[ij].thermal_conductance_z)
 
-                for kl in range(self.layer_total_nodes()):
-                    if ij == kl:
-                        self.xy_conductance[ij][kl] = 0
-                    else:
-                        self.xy_conductance[ij][kl] = self.nodes[ij].get_thermal_conductance_bw_nodes_of_same_layer(self.nodes[kl])
+            # Build sparse neighbor edges per chiplet (right + up) in local indexing.
+            # Chiplets are treated as disconnected islands in XY (no conduction through gaps).
+            u_list = []
+            v_list = []
+            g_list = []
+            if not self._chiplet_ranges:
+                raise RuntimeError(
+                    f"Non-homogeneous layer {self.layer_name} missing chiplet ranges; "
+                    "expected Layer_chiplet.create_nodes() to populate _chiplet_ranges."
+                )
+            for (start, nx, ny) in self._chiplet_ranges:
+                for i in range(nx):
+                    for j in range(ny):
+                        idx0 = start + i * ny + j
+                        n0 = self.nodes[idx0]
+                        if i + 1 < nx:
+                            idx1 = start + (i + 1) * ny + j
+                            g = n0.get_thermal_conductance_bw_nodes_of_same_layer(self.nodes[idx1])
+                            if g > 0:
+                                u_list.append(idx0); v_list.append(idx1); g_list.append(g)
+                        if j + 1 < ny:
+                            idx1 = start + i * ny + (j + 1)
+                            g = n0.get_thermal_conductance_bw_nodes_of_same_layer(self.nodes[idx1])
+                            if g > 0:
+                                u_list.append(idx0); v_list.append(idx1); g_list.append(g)
+            self.xy_edges_u = np.array(u_list, dtype=np.int64)
+            self.xy_edges_v = np.array(v_list, dtype=np.int64)
+            self.xy_edges_g = np.array(g_list, dtype=float)
 
         else:
             for i in range(self.total_x_nodes):
@@ -348,13 +381,29 @@ class Layer_chiplet:
                         self.z_minus_conductance[i*self.total_y_nodes + j] = self.nodes[i][j].convection_conductance*self.nodes[i][j].thermal_conductance_z/(self.nodes[i][j].convection_conductance + self.nodes[i][j].thermal_conductance_z)
                         # self.z_minus_conductance[i*self.total_y_nodes + j] = self.nodes[i][j].convection_resistance + self.nodes[i][j].thermal_resistance_z
 
-            # add logic to calculate the resistance between the nodes
-                    for k in range(self.total_x_nodes):
-                        for l in range(self.total_y_nodes):
-                            if i == k and j == l:
-                                self.xy_conductance[i*self.total_y_nodes + j][k*self.total_y_nodes + l] = 0
-                            else:
-                                self.xy_conductance[i*self.total_y_nodes + j][k*self.total_y_nodes + l] = self.nodes[i][j].get_thermal_conductance_bw_nodes_of_same_layer(self.nodes[k][l])
+            # Build sparse neighbor edges (right + up) in local indexing.
+            u_list = []
+            v_list = []
+            g_list = []
+            for i in range(self.total_x_nodes):
+                for j in range(self.total_y_nodes):
+                    n0 = self.nodes[i][j]
+                    idx0 = i*self.total_y_nodes + j
+                    if i + 1 < self.total_x_nodes:
+                        n1 = self.nodes[i + 1][j]
+                        idx1 = (i + 1)*self.total_y_nodes + j
+                        g = n0.get_thermal_conductance_bw_nodes_of_same_layer(n1)
+                        if g > 0:
+                            u_list.append(idx0); v_list.append(idx1); g_list.append(g)
+                    if j + 1 < self.total_y_nodes:
+                        n1 = self.nodes[i][j + 1]
+                        idx1 = i*self.total_y_nodes + (j + 1)
+                        g = n0.get_thermal_conductance_bw_nodes_of_same_layer(n1)
+                        if g > 0:
+                            u_list.append(idx0); v_list.append(idx1); g_list.append(g)
+            self.xy_edges_u = np.array(u_list, dtype=np.int64)
+            self.xy_edges_v = np.array(v_list, dtype=np.int64)
+            self.xy_edges_g = np.array(g_list, dtype=float)
 
     def get_power(self, total_steps):
         
@@ -441,6 +490,15 @@ class Layer_chiplet:
     
     def get_conductance(self):
         return self.xy_conductance
+    
+    def get_xy_edges(self):
+        """
+        Return sparse XY neighbor edges as (u, v, g) arrays, where u<v are local node indices.
+        Available for all layer types when using sparse assembly.
+        """
+        if self.xy_edges_u is None or self.xy_edges_v is None or self.xy_edges_g is None:
+            return None
+        return self.xy_edges_u, self.xy_edges_v, self.xy_edges_g
     
     def get_convective_conductance(self):
         return self.z_plus_conductance + self.z_minus_conductance

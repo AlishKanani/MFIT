@@ -106,9 +106,11 @@ def compute_flux_field(layers, package, temperature_all_map, index_heatmap, T_am
             # shared_cond is either:
             # - dense matrix (nB, nT)
             # - diagonal vector (aligned grids): shared_cond[i] couples bottom i to top i
+            # - edge list dict: {"type": "edge_list", "u": [...], "v": [...], "g": [...]}
             if shared_cond is None:
                 continue
             if isinstance(shared_cond, np.ndarray) and shared_cond.ndim == 1:
+                # Diagonal vector (aligned grids)
                 n = min(nB, nT, shared_cond.shape[0])
                 if n <= 0:
                     continue
@@ -117,7 +119,25 @@ def compute_flux_field(layers, package, temperature_all_map, index_heatmap, T_am
                 Q_bt = shared_cond[:n] * (Tb - Tt)  # W, positive from bottom -> top
                 Qz[bottom_off:bottom_off + n] += Q_bt
                 Qz[top_off:top_off + n] += Q_bt
+            elif isinstance(shared_cond, dict) and shared_cond.get("type") == "edge_list":
+                # Edge list (rectilinear grids with different resolutions)
+                u_loc = shared_cond.get("u")
+                v_loc = shared_cond.get("v")
+                g_loc = shared_cond.get("g")
+                if u_loc is not None and v_loc is not None and g_loc is not None:
+                    for idx in range(len(g_loc)):
+                        i = int(u_loc[idx])
+                        j = int(v_loc[idx])
+                        G_bt = float(g_loc[idx])
+                        if G_bt <= 0:
+                            continue
+                        Tb = T_global[bottom_off + i]
+                        Tt = T_global[top_off + j]
+                        Q_bt = G_bt * (Tb - Tt)
+                        Qz[bottom_off + i] += Q_bt
+                        Qz[top_off + j] += Q_bt
             else:
+                # Dense matrix fallback
                 for i in range(nB):
                     for j in range(nT):
                         G_bt = shared_cond[i, j]
